@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fxservice/momo/app"
+	"fxservice/service/momo/app"
+	"fxservice/service/momo/config"
 )
 
 func main() {
-	addr := ":8080"
-	app.Start(addr)
+	app.Start(config.Conf.ServerConf.InternalListenAddress)
 }

@@ -1,7 +1,7 @@
 package app
 
 import (
-	"fxservice/momo/handlers"
+	"fxservice/service/momo/handlers"
 
 	"fxlibraries/httpserver"
 	"fxlibraries/loggers"
@@ -14,7 +14,9 @@ func init() {
 
 func Start(addr string) {
 	r := httpserver.NewRouter()
-	r.RouteHandleFunc("/test", handlers.Test).Methods("GET")
+	r.RouteHandleFunc("/status", handlers.Test).Methods("GET")
+
+	r.RouteHandleFunc("/accounts/new", handlers.UnRegisterMomoAccounts).Methods("GET")
 
 	loggers.Info.Printf("Starting User Center External Service [\033[0;32;1mOK\t%+v\033[0m] \n", addr)
 	panic(r.ListenAndServe(addr))
