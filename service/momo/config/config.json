@@ -2,9 +2,9 @@
    "DBConf" : {
       "DBName"      : "momo",
       "Port"        : 3306,
-      "Host"        : "192.168.1.108",
-      "Password"    : "koudai123456",
-      "User"        : "wans"
+      "Host"        : "192.168.1.103",
+      "Password"    : "wans198059",
+      "User"        : "wanliping"
    },
    "ServerConf" : {
       "ExternalListenAddress" : ":19801",

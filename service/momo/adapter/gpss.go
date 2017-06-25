@@ -19,7 +19,14 @@ func GetRandomGPS(province, city string) (*domain.GPSLocation, error) {
 	return &gpss[index], nil
 }
 
-func AddGpss(gpss *[]domain.GPSLocation) error {
-	db := dbPool.NewConn()
-	return db.Create(gpss).Error
+func AddGpss(gpss []domain.GPSLocation) error {
+	db := dbPool.NewConn().Begin()
+	for i := range gpss {
+		if err := db.Create(&gpss[i]).Error; err != nil {
+			db.Rollback()
+			return err
+		}
+	}
+	db.Commit()
+	return nil
 }

@@ -8,16 +8,15 @@ import (
 	"fxservice/service/momo/adapter"
 )
 
-func AddGPSs(req *httpserver.Request) *httpserver.Response {
-	var gpss []domain.GPSLocation
-	if err := req.Parse(&gpss); err != nil {
-		loggers.Warn.Printf("AddGPSs parse gps error %s", err.Error())
+func AddPhotos(req *httpserver.Request) *httpserver.Response {
+	var photos [][]domain.Photos
+	if err := req.Parse(&photos); err != nil {
+		loggers.Warn.Printf("AddPhotos parse photos error %s", err.Error())
 		return httpserver.NewResponseWithError(errors.NewBadRequest("WRONG PARAMTER"))
 	}
-	if err := adapter.AddGpss(gpss); err != nil {
-		loggers.Warn.Printf("AddGpss error %s ", err.Error())
+	if err := adapter.AddPhotos(photos); err != nil {
+		loggers.Warn.Printf("AddPhotos error %s ", err.Error())
 		return httpserver.NewResponseWithError(errors.InternalServerError)
 	}
-
 	return httpserver.NewResponse()
 }

@@ -62,14 +62,14 @@ const (
 type Device struct {
 	ID         int64      `json:"-" gorm:"primary_key;column:tid;unique_index:devices_pkey"`
 	SN         string     `json:"sn,omitempty"`
-	IMEI       string     `json:"imei,omitempty"`
-	UDID       string     `json:"udid,omitempty"`
-	IOSVersion string     `json:"ios_version,omitempty"`
-	MAC        string     `json:"mac,omitempty"`
-	WIFI       string     `json:"wifi,omitempty"`
+	IMEI       string     `json:"imei,omitempty" gorm:"column:imei"`
+	UDID       string     `json:"udid,omitempty" gorm:"column:udid"`
+	IOSVersion string     `json:"ios_version,omitempty" gorm:"column:ios_version"`
+	MAC        string     `json:"mac,omitempty" gorm:"column:mac"`
+	WIFI       string     `json:"wifi,omitempty" gorm:"column:wifi"`
 	Model      string     `json:"model,omitempty"`
-	IDFA       string     `json:"idfa,omitempty"`
-	IDFV       string     `json:"idfv,omitempty"`
+	IDFA       string     `json:"idfa,omitempty" gorm:"column:idfa"`
+	IDFV       string     `json:"idfv,omitempty" gorm:"column:idfv"`
 	Region     string     `json:"region,omitempty"`
 	ModelNum   string     `json:"model_num,omitempty"`
 	DeviceName string     `json:"device_name,omitempty"`
