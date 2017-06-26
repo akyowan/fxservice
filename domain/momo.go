@@ -24,9 +24,8 @@ type MomoAccount struct {
 	City         string            `json:"city,omitempty"`
 	RegisterTime *time.Time        `json:"register_time,omitempty"`
 	Status       MomoAccountStatus `json:"-"`
-
-	CreateTime *time.Time `json:"create_time"`
-	UpdateTime *time.Time `json:"update_time"`
+	CreateTime   *time.Time        `json:"create_time,omitempty"`
+	UpdateTime   *time.Time        `json:"update_time,omitempty"`
 }
 
 func (*MomoAccount) TableName() string {
@@ -52,34 +51,45 @@ const (
 type MomoAccountStatus int
 
 const (
-	_          MomoAccountStatus = iota
-	UnRegister                   // 1 未注册
-	Registered                   // 2 已注册
-	Disabled                     // 3 被禁用
+	_                     MomoAccountStatus = iota
+	MomoAccountUnRegister                   // 1 未注册
+	MomoAccountRegistered                   // 2 已注册
+	MomoAccountLocked                       // 3 锁定中(正在注册)
+	MomoAccountDisabled                     // 4 被禁用
 )
 
 // 硬件信息
 type Device struct {
-	ID         int64      `json:"-" gorm:"primary_key;column:tid;unique_index:devices_pkey"`
-	SN         string     `json:"sn,omitempty"`
-	IMEI       string     `json:"imei,omitempty" gorm:"column:imei"`
-	UDID       string     `json:"udid,omitempty" gorm:"column:udid"`
-	IOSVersion string     `json:"ios_version,omitempty" gorm:"column:ios_version"`
-	MAC        string     `json:"mac,omitempty" gorm:"column:mac"`
-	WIFI       string     `json:"wifi,omitempty" gorm:"column:wifi"`
-	Model      string     `json:"model,omitempty"`
-	IDFA       string     `json:"idfa,omitempty" gorm:"column:idfa"`
-	IDFV       string     `json:"idfv,omitempty" gorm:"column:idfv"`
-	Region     string     `json:"region,omitempty"`
-	ModelNum   string     `json:"model_num,omitempty"`
-	DeviceName string     `json:"device_name,omitempty"`
-	CreateTime *time.Time `json:"create_time,omitempty"`
-	UpdateTime *time.Time `json:"update_time,omitempty"`
+	ID         int64        `json:"-" gorm:"primary_key;column:tid;unique_index:devices_pkey"`
+	SN         string       `json:"sn,omitempty"`
+	IMEI       string       `json:"imei,omitempty" gorm:"column:imei"`
+	SEQ        string       `json:"seq,omitempty" gorm:"column:seq"`
+	IOSVersion string       `json:"ios_version,omitempty" gorm:"column:ios_version"`
+	MAC        string       `json:"mac,omitempty" gorm:"column:mac"`
+	WIFI       string       `json:"wifi,omitempty" gorm:"column:wifi"`
+	Model      string       `json:"model,omitempty"`
+	IDFA       string       `json:"idfa,omitempty" gorm:"column:idfa"`
+	IDFV       string       `json:"idfv,omitempty" gorm:"column:idfv"`
+	Region     string       `json:"region,omitempty"`
+	ModelNum   string       `json:"model_num,omitempty"`
+	DeviceName string       `json:"device_name,omitempty"`
+	Used       int          `json:"-"`
+	Status     DeviceStatus `json:"-"`
+	CreateTime *time.Time   `json:"create_time,omitempty"`
+	UpdateTime *time.Time   `json:"update_time,omitempty"`
 }
 
 func (*Device) TableName() string {
 	return "devices"
 }
+
+type DeviceStatus int
+
+const (
+	_ DeviceStatus = iota
+	DeviceEnable
+	DeviceDisabled
+)
 
 // GPS信息
 type GPSLocation struct {
@@ -115,4 +125,13 @@ type MomoPhotos struct {
 
 func (*MomoPhotos) TableName() string {
 	return "momo_photos"
+}
+
+type NickName struct {
+	ID       int64  `json:"-" gorm:"primary_key;column:tid;unique_index:momo_photos"`
+	NickName string `json:"-"`
+}
+
+func (*NickName) TableName() string {
+	return "nick_names"
 }
