@@ -19,9 +19,7 @@ func GetNewMomoAccount(province, city string) (*domain.MomoAccount, error) {
 		db.Rollback()
 		return nil, dbResult.Error
 	}
-	now := time.Now()
 	momoAccount.Status = domain.MomoAccountLocked
-	momoAccount.UpdateTime = &now
 	if err := db.Save(&momoAccount).Error; err != nil {
 		db.Rollback()
 		return nil, err
@@ -52,4 +50,20 @@ func GetRandNickName() (*domain.NickName, error) {
 	rand.Seed(int64(time.Now().Nanosecond()))
 	index := rand.Intn(len(nickNames))
 	return &nickNames[index], nil
+}
+
+func CompleteMomoAccount(account string, momoAccount *domain.MomoAccount) error {
+	db := dbPool.NewConn()
+	now := time.Now()
+	updateMap := map[string]interface{}{
+		"momo_account":  momoAccount.MomoAccount,
+		"status":        domain.MomoAccountRegistered,
+		"register_time": &now,
+	}
+	if err := db.Model(&momoAccount).
+		Where("account = ? and status = ?", account, domain.MomoAccountLocked).
+		Updates(updateMap).Error; err != nil {
+		return err
+	}
+	return nil
 }

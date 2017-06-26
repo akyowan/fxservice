@@ -24,8 +24,8 @@ type MomoAccount struct {
 	City         string            `json:"city,omitempty"`
 	RegisterTime *time.Time        `json:"register_time,omitempty"`
 	Status       MomoAccountStatus `json:"-"`
-	CreateTime   *time.Time        `json:"create_time,omitempty"`
-	UpdateTime   *time.Time        `json:"update_time,omitempty"`
+	CreatedAt    *time.Time        `json:"create_time,omitempty" gorm:"column:create_time"`
+	UpdatedAt    *time.Time        `json:"update_time,omitempty" gorm:"column:update_time"`
 }
 
 func (*MomoAccount) TableName() string {
@@ -75,8 +75,8 @@ type Device struct {
 	DeviceName string       `json:"device_name,omitempty"`
 	Used       int          `json:"-"`
 	Status     DeviceStatus `json:"-"`
-	CreateTime *time.Time   `json:"create_time,omitempty"`
-	UpdateTime *time.Time   `json:"update_time,omitempty"`
+	CreatedAt  *time.Time   `json:"create_time,omitempty" gorm:"column:create_time"`
+	UpdatedAt  *time.Time   `json:"update_time,omitempty" gorm:"column:update_time"`
 }
 
 func (*Device) TableName() string {

@@ -7,7 +7,6 @@ import (
 	"fxservice/domain"
 	"fxservice/service/momo/adapter"
 	"fxservice/service/momo/common"
-	"time"
 )
 
 func UnRegisterMomoAccounts(req *httpserver.Request) *httpserver.Response {
@@ -109,7 +108,6 @@ func AddAccounts(req *httpserver.Request) *httpserver.Response {
 
 		operator := common.GenRandOperator()
 
-		now := time.Now()
 		accounts[i].NickName = nickName.NickName
 		accounts[i].MomoPassword = common.GenRandPassword(8)
 
@@ -119,7 +117,6 @@ func AddAccounts(req *httpserver.Request) *httpserver.Response {
 
 		accounts[i].PhotosID = photosID
 		accounts[i].Avatar = avatar
-		accounts[i].CreateTime = &now
 		accounts[i].SN = device.SN
 		accounts[i].Status = domain.MomoAccountUnRegister
 		accounts[i].Gender = domain.Female
@@ -127,6 +124,30 @@ func AddAccounts(req *httpserver.Request) *httpserver.Response {
 	}
 	if err := adapter.AddAccounts(newAccounts); err != nil {
 		loggers.Warn.Printf("AddAccounts error %s", err.Error())
+		return httpserver.NewResponseWithError(errors.InternalServerError)
+	}
+
+	return httpserver.NewResponse()
+}
+
+func CompleteMomoAccount(req *httpserver.Request) *httpserver.Response {
+	var momoAccount domain.MomoAccount
+	account := req.UrlParams["account"]
+	if account == "" {
+		loggers.Warn.Printf("CompleteMomoAccount no account")
+		return httpserver.NewResponseWithError(errors.ParameterError)
+	}
+
+	if err := req.Parse(&momoAccount); err != nil {
+		loggers.Warn.Printf("CompleteMomoAccount parse momo account error %s", err.Error())
+		return httpserver.NewResponseWithError(errors.ParameterError)
+	}
+	if momoAccount.MomoAccount == "" {
+		loggers.Warn.Printf("CompleteMomoAccount no momo account")
+		return httpserver.NewResponseWithError(errors.NewBadRequest("no momo account"))
+	}
+	if err := adapter.CompleteMomoAccount(account, &momoAccount); err != nil {
+		loggers.Warn.Printf("CompleteMomoAccount update momo account error %s", err.Error())
 		return httpserver.NewResponseWithError(errors.InternalServerError)
 	}
 
