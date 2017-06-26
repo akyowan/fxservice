@@ -6,6 +6,8 @@ import (
 	"fxlibraries/loggers"
 	"fxservice/domain"
 	"fxservice/service/momo/adapter"
+	"fxservice/service/momo/common"
+	"time"
 )
 
 func UnRegisterMomoAccounts(req *httpserver.Request) *httpserver.Response {
@@ -77,5 +79,56 @@ func UnRegisterMomoAccounts(req *httpserver.Request) *httpserver.Response {
 }
 
 func AddAccounts(req *httpserver.Request) *httpserver.Response {
+	var accounts []domain.MomoAccount
+	if err := req.Parse(&accounts); err != nil {
+		loggers.Warn.Printf("AddAccounts parse accounts error %s", err.Error())
+		return httpserver.NewResponseWithError(errors.ParameterError)
+	}
+	var newAccounts []domain.MomoAccount
+	for i := range accounts {
+		if accounts[i].Account == "" || accounts[i].AccountType == 0 || accounts[i].Password == "" {
+			loggers.Warn.Printf("AddAccounts invalid account %s:%d:%s", accounts[i].Account, accounts[i].AccountType, accounts[i].Password)
+			continue
+		}
+		photosID := adapter.GetRandomPhotosID()
+		avatar, err := adapter.GetAvatar(photosID)
+		if err != nil {
+			loggers.Warn.Printf("AddAccounts get avatar %s error %s", photosID, err.Error())
+			continue
+		}
+		device, err := adapter.GetEnableDevice()
+		if err != nil {
+			loggers.Warn.Printf("AddAccounts get enable device error %s", err.Error())
+			return httpserver.NewResponseWithError(errors.NewNotFound("No enable devices"))
+		}
+		nickName, err := adapter.GetRandNickName()
+		if err != nil {
+			loggers.Warn.Printf("AddAccounts get nickname error %s", err.Error())
+			return httpserver.NewResponseWithError(errors.NewNotFound("No nicknames "))
+		}
+
+		operator := common.GenRandOperator()
+
+		now := time.Now()
+		accounts[i].NickName = nickName.NickName
+		accounts[i].MomoPassword = common.GenRandPassword(8)
+
+		accounts[i].Operator = operator.Operator
+		accounts[i].OperatorMC = operator.OperatorMC
+		accounts[i].OperatorMN = operator.OperatorMN
+
+		accounts[i].PhotosID = photosID
+		accounts[i].Avatar = avatar
+		accounts[i].CreateTime = &now
+		accounts[i].SN = device.SN
+		accounts[i].Status = domain.MomoAccountUnRegister
+		accounts[i].Gender = domain.Female
+		newAccounts = append(newAccounts, accounts[i])
+	}
+	if err := adapter.AddAccounts(newAccounts); err != nil {
+		loggers.Warn.Printf("AddAccounts error %s", err.Error())
+		return httpserver.NewResponseWithError(errors.InternalServerError)
+	}
+
 	return httpserver.NewResponse()
 }

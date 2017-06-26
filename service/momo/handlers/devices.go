@@ -13,7 +13,7 @@ func AddDevices(req *httpserver.Request) *httpserver.Response {
 	var devices []domain.Device
 	if err := req.Parse(&devices); err != nil {
 		loggers.Warn.Printf("AddDevices parse gps error %s", err.Error())
-		return httpserver.NewResponseWithError(errors.NewBadRequest("WRONG PARAMTER"))
+		return httpserver.NewResponseWithError(errors.ParameterError)
 	}
 
 	common.CompletionDevices(devices)

@@ -19,17 +19,21 @@ func CompletionDevices(devices []domain.Device) {
 		if devices[i].WIFI == "" {
 			devices[i].WIFI = GenRandWifi()
 		}
-		if devices[i].IOSVersion == "" {
+		if devices[i].IOSVersion == "" || devices[i].IOSVersion < "10.3.1" {
 			devices[i].IOSVersion = GenRandIOSVersion()
 		}
 		if devices[i].Region == "" {
 			devices[i].Region = GenRandRegion()
 		}
-		if devices[i].ModelNum == "" {
-			devices[i].ModelNum = GenRandModelNum()
+
+		if devices[i].Model == "" || devices[i].Model < "iPhone9,1" || devices[i].ModelNum == "" {
+			model := GenRandModel()
+			devices[i].Model = model.Model
+			devices[i].ModelNum = model.ModelNum
 		}
-		if devices[i].Model == "" {
-			devices[i].Model = GenRandModel()
+
+		if devices[i].DeviceName == "" {
+			devices[i].DeviceName = GenRandDeviceName()
 		}
 	}
 }

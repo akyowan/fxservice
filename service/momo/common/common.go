@@ -54,14 +54,14 @@ func GenRandWifi() string {
 	return wifi
 }
 
-func GenRandModelNum() string {
-	return "ML7J2"
-}
-
-func GenRandModel() string {
-	return "ML7J2"
-}
-
 func GenRandRegion() string {
-	return "Region"
+	return "CH/A"
+}
+
+func GenRandPassword(n int) string {
+	return stringhelper.GererateHash(n)
+}
+
+func GenRandDeviceName() string {
+	return fmt.Sprintf("%s的iPhone", GenRandName())
 }

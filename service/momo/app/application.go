@@ -16,10 +16,9 @@ func Start(addr string) {
 	r := httpserver.NewRouter()
 	r.RouteHandleFunc("/status", handlers.Test).Methods("GET")
 
+	r.RouteHandleFunc("/accounts", handlers.AddAccounts).Methods("POST")
 	r.RouteHandleFunc("/accounts/new", handlers.UnRegisterMomoAccounts).Methods("GET")
-
 	r.RouteHandleFunc("/gpss", handlers.AddGPSs).Methods("POST")
-
 	r.RouteHandleFunc("/photos", handlers.AddPhotos).Methods("POST")
 	r.RouteHandleFunc("/devices", handlers.AddDevices).Methods("POST")
 
