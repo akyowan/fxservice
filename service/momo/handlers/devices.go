@@ -18,10 +18,13 @@ func AddDevices(req *httpserver.Request) *httpserver.Response {
 
 	common.CompletionDevices(devices)
 
-	if err := adapter.AddDevices(devices); err != nil {
+	rows, err := adapter.AddDevices(devices)
+	if err != nil {
 		loggers.Warn.Printf("AddDevices error %s ", err.Error())
 		return httpserver.NewResponseWithError(errors.InternalServerError)
 	}
+	resp := httpserver.NewResponse()
+	resp.Data = rows
 
-	return httpserver.NewResponse()
+	return resp
 }

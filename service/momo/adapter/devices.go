@@ -18,7 +18,7 @@ func GetDevice(sn string) (*domain.Device, error) {
 	return &device, nil
 }
 
-func AddDevices(devices []domain.Device) error {
+func AddDevices(devices []domain.Device) (int64, error) {
 	db := dbPool.NewConn().Begin()
 	for i := range devices {
 		if devices[i].SN == "" || devices[i].IMEI == "" || devices[i].SEQ == "" {
@@ -27,13 +27,17 @@ func AddDevices(devices []domain.Device) error {
 		if devices[i].Status == 0 {
 			devices[i].Status = domain.DeviceEnable
 		}
+		var device domain.Device
+		if !(db.Where("sn = ?", devices[i].SN).First(&device).RecordNotFound()) {
+			continue
+		}
 		if err := db.Create(&devices[i]).Error; err != nil {
 			db.Rollback()
-			return err
+			return 0, err
 		}
 	}
 	db.Commit()
-	return nil
+	return db.RowsAffected, nil
 }
 
 func GetEnableDevice() (*domain.Device, error) {
