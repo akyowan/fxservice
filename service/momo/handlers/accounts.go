@@ -85,9 +85,12 @@ func AddAccounts(req *httpserver.Request) *httpserver.Response {
 	}
 	var newAccounts []domain.MomoAccount
 	for i := range accounts {
-		if accounts[i].Account == "" || accounts[i].AccountType == 0 || accounts[i].Password == "" {
-			loggers.Warn.Printf("AddAccounts invalid account %s:%d:%s", accounts[i].Account, accounts[i].AccountType, accounts[i].Password)
+		if accounts[i].Account == "" || accounts[i].Password == "" {
+			loggers.Warn.Printf("AddAccounts invalid account %s:%s", accounts[i].Account, accounts[i].Password)
 			continue
+		}
+		if accounts[i].AccountType == 0 {
+			accounts[i].AccountType = domain.QQ
 		}
 		photosID := adapter.GetRandomPhotosID()
 		avatar, err := adapter.GetAvatar(photosID)
