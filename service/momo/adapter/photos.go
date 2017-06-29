@@ -10,7 +10,7 @@ import (
 
 func AddPhotos(photos [][]domain.Photos) error {
 	db := dbPool.NewConn().Begin()
-	beginID := 1000
+	beginID := 1120
 	for i := range photos {
 		beginID = beginID + 1
 		photoGroup := photos[i]
@@ -56,6 +56,6 @@ func GetAvatar(photosID string) (string, error) {
 
 func GetRandomPhotosID() string {
 	rand.Seed(int64(time.Now().Nanosecond()))
-	id := rand.Intn(120) + 1000
+	id := rand.Intn(230) + 1000
 	return fmt.Sprintf("%d", id)
 }
