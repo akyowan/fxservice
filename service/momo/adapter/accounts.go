@@ -26,6 +26,7 @@ func GetNewMomoAccount(province, city string) (*domain.MomoAccount, error) {
 	}
 
 	momoAccount.PhotosID = avatar.PhotosID
+	momoAccount.Avatar = avatar.URL
 	momoAccount.Status = domain.MomoAccountLocked
 	if err := db.Save(&momoAccount).Error; err != nil {
 		db.Rollback()
