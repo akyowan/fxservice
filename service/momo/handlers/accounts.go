@@ -92,12 +92,6 @@ func AddAccounts(req *httpserver.Request) *httpserver.Response {
 		if accounts[i].AccountType == 0 {
 			accounts[i].AccountType = domain.QQ
 		}
-		photosID := adapter.GetRandomPhotosID()
-		avatar, err := adapter.GetAvatar(photosID)
-		if err != nil {
-			loggers.Warn.Printf("AddAccounts get avatar %s error %s", photosID, err.Error())
-			continue
-		}
 		device, err := adapter.GetEnableDevice()
 		if err != nil {
 			loggers.Warn.Printf("AddAccounts get enable device error %s", err.Error())
@@ -110,16 +104,11 @@ func AddAccounts(req *httpserver.Request) *httpserver.Response {
 		}
 
 		operator := common.GenRandOperator()
-
 		accounts[i].NickName = nickName.NickName
 		accounts[i].MomoPassword = common.GenRandPassword(8)
-
 		accounts[i].Operator = operator.Operator
 		accounts[i].OperatorMC = operator.OperatorMC
 		accounts[i].OperatorMN = operator.OperatorMN
-
-		accounts[i].PhotosID = photosID
-		accounts[i].Avatar = avatar
 		accounts[i].SN = device.SN
 		accounts[i].Status = domain.MomoAccountUnRegister
 		accounts[i].Gender = domain.Female

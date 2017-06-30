@@ -9,7 +9,7 @@ import (
 )
 
 func AddPhotos(req *httpserver.Request) *httpserver.Response {
-	var photos [][]domain.Photos
+	var photos [][]domain.Photo
 	if err := req.Parse(&photos); err != nil {
 		loggers.Warn.Printf("AddPhotos parse photos error %s", err.Error())
 		return httpserver.NewResponseWithError(errors.NewBadRequest("WRONG PARAMTER"))

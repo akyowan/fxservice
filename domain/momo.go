@@ -104,27 +104,35 @@ func (*GPSLocation) TableName() string {
 	return "gpss"
 }
 
+type PhotoGroup struct {
+	ID       int64        `json:"-" gorm:"primary_key;column:tid;unique_index:photo_groups_pkey"`
+	PhotosID string       `json:"photos_id" gorm:"unique_index:photos_id_idx"`
+	Status   PhotosStatus `json:"photos_status"`
+}
+
+func (*PhotoGroup) TableName() string {
+	return "photo_groups"
+}
+
+type PhotosStatus int
+
+const (
+	_                   PhotosStatus = iota
+	PhotosStatusFree                 // 可用
+	PhotosStatusUsed                 // 已用
+	PhotosStatusDisable              // 禁用
+)
+
 // 套图信息
-type Photos struct {
+type Photo struct {
 	ID       int64  `json:"-" gorm:"primary_key;column:tid;unique_index:photos_pkey"`
 	PhotosID string `json:"photos_id,omitempty"`
 	Seq      int    `json:"seq,omitempty"`
 	URL      string `json:"url,omitempty"`
 }
 
-func (*Photos) TableName() string {
+func (*Photo) TableName() string {
 	return "photos"
-}
-
-// 陌陌图片信息
-type MomoPhotos struct {
-	ID       int64  `json:"-" gorm:"primary_key;column:tid;unique_index:momo_photos"`
-	Account  string `json:"account,omitempty"`
-	PhotosID string `json:"photos_id,omitempty"`
-}
-
-func (*MomoPhotos) TableName() string {
-	return "momo_photos"
 }
 
 type NickName struct {
