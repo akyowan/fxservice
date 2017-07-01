@@ -7,6 +7,9 @@ import (
 	"fxservice/domain"
 	"fxservice/service/momo/adapter"
 	"fxservice/service/momo/common"
+	"strconv"
+	"strings"
+	"time"
 )
 
 func UnRegisterMomoAccounts(req *httpserver.Request) *httpserver.Response {
@@ -21,7 +24,7 @@ func UnRegisterMomoAccounts(req *httpserver.Request) *httpserver.Response {
 		return httpserver.NewResponseWithError(errors.NewBadRequest("NO CITY"))
 	}
 
-	momoAccount, err := adapter.GetNewMomoAccount(province, city)
+	momoAccount, err := adapter.GetNewMomoAccount(province, city, strings.Split(req.RemoteAddr, ":")[0])
 	if err != nil {
 		loggers.Warn.Printf("UnRegisterMomoAccounts get new account error %s", err.Error())
 		if err == errors.NotFound {
@@ -138,10 +141,102 @@ func CompleteMomoAccount(req *httpserver.Request) *httpserver.Response {
 		loggers.Warn.Printf("CompleteMomoAccount no momo account")
 		return httpserver.NewResponseWithError(errors.NewBadRequest("no momo account"))
 	}
+	if momoAccount.Status == 0 {
+		momoAccount.Status = domain.MomoAccountRegistered
+	}
 	if err := adapter.CompleteMomoAccount(account, &momoAccount); err != nil {
 		loggers.Warn.Printf("CompleteMomoAccount update momo account error %s", err.Error())
 		return httpserver.NewResponseWithError(errors.InternalServerError)
 	}
 
+	return httpserver.NewResponse()
+}
+
+func GetMomoAccounts(req *httpserver.Request) *httpserver.Response {
+	param := adapter.AccountQueryParam{
+		Limit:  10,
+		Offset: 0,
+	}
+	if v := req.QueryParams.Get("account"); v != "" {
+		param.Account = v
+	}
+	if v := req.QueryParams.Get("province"); v != "" {
+		param.Province = v
+	}
+	if v := req.QueryParams.Get("city"); v != "" {
+		param.Province = v
+	}
+	if v := req.QueryParams.Get("momoAccount"); v != "" {
+		param.MomoAccount = v
+	}
+	if v := req.QueryParams.Get("operator"); v != "" {
+		param.Operator = v
+	}
+	if v := req.QueryParams.Get("limit"); v != "" {
+		if i, err := strconv.Atoi(v); (err == nil) && (i < 50) && (i > 0) {
+			param.Limit = i
+		}
+	}
+	if v := req.QueryParams.Get("gender"); v != "" {
+		if i, err := strconv.Atoi(v); (err == nil) && (i > 0) {
+			param.Gender = domain.GenderType(i)
+		}
+	}
+	if v := req.QueryParams.Get("offset"); v != "" {
+		if i, err := strconv.Atoi(v); (err == nil) && (i > 0) {
+			param.Offset = i
+		}
+	}
+	if v := req.QueryParams.Get("status"); v != "" {
+		if i, err := strconv.Atoi(v); (err == nil) && (i > 0) {
+			param.Status = domain.MomoAccountStatus(i)
+		}
+	}
+
+	if v := req.QueryParams.Get("type"); v != "" {
+		if i, err := strconv.Atoi(v); (err == nil) && (i > 0) {
+			param.Type = domain.MomoAccountType(i)
+		}
+	}
+	if v := req.QueryParams.Get("begin"); v != "" {
+		timestap, err := strconv.ParseInt(v, 10, 0)
+		if err != nil {
+			return httpserver.NewResponseWithError(errors.NewBadRequest("begin time format error"))
+		}
+		t := time.Unix(timestap, 0)
+		param.Begin = &t
+	}
+	if v := req.QueryParams.Get("end"); v != "" {
+		timestap, err := strconv.ParseInt(v, 10, 0)
+		if err != nil {
+			return httpserver.NewResponseWithError(errors.NewBadRequest("end tie format error"))
+		}
+		t := time.Unix(timestap, 0)
+		param.End = &t
+	}
+	loggers.Debug.Println(param)
+
+	accounts, err := adapter.GetMomoAccounts(&param)
+	if err != nil {
+		loggers.Warn.Printf("GetMomoAccounts error %s", err.Error())
+		return httpserver.NewResponseWithError(errors.InternalServerError)
+	}
+
+	resp := httpserver.NewResponse()
+
+	resp.Data = accounts
+	return resp
+}
+
+func PatchMomoAccounts(req *httpserver.Request) *httpserver.Response {
+	var accounts []domain.MomoAccount
+	if err := req.Parse(&accounts); err != nil {
+		loggers.Warn.Printf("PatchMomoAccounts parse param error %s", err.Error())
+		return httpserver.NewResponseWithError(errors.ParameterError)
+	}
+	if err := adapter.PatchMomoAccounts(accounts); err != nil {
+		loggers.Warn.Printf("PatchMomoAccounts error %s", err.Error())
+		return httpserver.NewResponseWithError(errors.ParameterError)
+	}
 	return httpserver.NewResponse()
 }

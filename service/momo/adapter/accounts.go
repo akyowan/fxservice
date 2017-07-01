@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func GetNewMomoAccount(province, city string) (*domain.MomoAccount, error) {
+func GetNewMomoAccount(province, city, remoteAddr string) (*domain.MomoAccount, error) {
 	db := dbPool.NewConn().Begin()
 	var momoAccount domain.MomoAccount
 	dbResult := db.Where("status = ?", domain.MomoAccountUnRegister).Order("tid").First(&momoAccount)
@@ -28,6 +28,9 @@ func GetNewMomoAccount(province, city string) (*domain.MomoAccount, error) {
 	momoAccount.PhotosID = avatar.PhotosID
 	momoAccount.Avatar = avatar.URL
 	momoAccount.Status = domain.MomoAccountLocked
+	momoAccount.RegisterHost = remoteAddr
+	momoAccount.Province = province
+	momoAccount.City = city
 	if err := db.Save(&momoAccount).Error; err != nil {
 		db.Rollback()
 		return nil, err
@@ -36,10 +39,91 @@ func GetNewMomoAccount(province, city string) (*domain.MomoAccount, error) {
 	return &momoAccount, nil
 }
 
+type AccountQueryParam struct {
+	Status      domain.MomoAccountStatus
+	Type        domain.MomoAccountType
+	Account     string
+	MomoAccount string
+	Gender      domain.GenderType
+	Province    string
+	City        string
+	Operator    string
+	Begin       *time.Time
+	End         *time.Time
+	Limit       int
+	Offset      int
+}
+
+func GetMomoAccounts(param *AccountQueryParam) ([]domain.MomoAccount, error) {
+	var accounts []domain.MomoAccount
+	db := dbPool.NewConn()
+	if param.Status != 0 {
+		db = db.Where("status = ?", param.Status)
+	}
+	if param.Type != 0 {
+		db = db.Where("type = ?", param.Type)
+	}
+	if param.Account != "" {
+		db = db.Where("account = ?", param.Account)
+	}
+	if param.MomoAccount != "" {
+		db = db.Where("momo_account = ?", param.MomoAccount)
+	}
+	if param.Gender != 0 {
+		db = db.Where("gender = ?", param.Gender)
+	}
+	if param.Province != "" {
+		db = db.Where("province = ?", param.Province)
+	}
+	if param.City != "" {
+		db = db.Where("city = ?", param.City)
+	}
+	if param.Operator != "" {
+		db = db.Where("operator = ?", param.Operator)
+	}
+	if param.Begin != nil {
+		db = db.Where("create_time > ?", param.Begin)
+	}
+	if param.End != nil {
+		db = db.Where("create_time < ?", param.End)
+	}
+	if err := db.Offset(param.Offset).Limit(param.Limit).Order("create_time desc").Find(&accounts).Error; err != nil {
+		return nil, err
+	}
+	return accounts, nil
+}
+
 func AddAccounts(accounts []domain.MomoAccount) error {
 	db := dbPool.NewConn().Begin()
 	for i := range accounts {
 		if err := db.Create(&accounts[i]).Error; err != nil {
+			db.Rollback()
+			return err
+		}
+	}
+	db.Commit()
+	return nil
+}
+
+func PatchMomoAccounts(accounts []domain.MomoAccount) error {
+	db := dbPool.NewConn().Begin()
+	for i := range accounts {
+		if accounts[i].Account == "" {
+			continue
+		}
+		account := domain.MomoAccount{
+			Account: accounts[i].Account,
+		}
+		if accounts[i].Province != "" {
+			account.Province = accounts[i].Province
+		}
+		if accounts[i].City != "" {
+			account.City = accounts[i].City
+		}
+		if accounts[i].Status != 0 {
+			account.Status = accounts[i].Status
+		}
+		if err := db.Model(&account).Where("account = ?", account.Account).UpdateColumns(account).Error; err != nil {
 			db.Rollback()
 			return err
 		}
@@ -65,7 +149,7 @@ func CompleteMomoAccount(account string, momoAccount *domain.MomoAccount) error 
 	now := time.Now()
 	updateMap := map[string]interface{}{
 		"momo_account":  momoAccount.MomoAccount,
-		"status":        domain.MomoAccountRegistered,
+		"status":        momoAccount.Status,
 		"register_time": &now,
 	}
 	if err := db.Model(&momoAccount).

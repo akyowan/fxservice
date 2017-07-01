@@ -2,7 +2,7 @@
    "DBConf" : {
       "DBName"      : "momo",
       "Port"        : 3306,
-      "Host"        : "192.168.1.107",
+      "Host"        : "192.168.2.152",
       "Password"    : "koudai123456",
       "User"        : "wans"
    },

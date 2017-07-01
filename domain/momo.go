@@ -23,7 +23,8 @@ type MomoAccount struct {
 	Province     string            `json:"province,omitempty"`
 	City         string            `json:"city,omitempty"`
 	RegisterTime *time.Time        `json:"register_time,omitempty"`
-	Status       MomoAccountStatus `json:"-"`
+	RegisterHost string            `json:"register_host,omitempty"`
+	Status       MomoAccountStatus `json:"status"`
 	CreatedAt    *time.Time        `json:"create_time,omitempty" gorm:"column:create_time"`
 	UpdatedAt    *time.Time        `json:"update_time,omitempty" gorm:"column:update_time"`
 }
