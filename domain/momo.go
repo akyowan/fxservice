@@ -57,6 +57,7 @@ const (
 	MomoAccountRegistered                   // 2 已注册
 	MomoAccountLocked                       // 3 锁定中(正在注册)
 	MomoAccountDisabled                     // 4 被禁用
+	MomoAccountOnline                       // 5 在线中
 )
 
 // 硬件信息

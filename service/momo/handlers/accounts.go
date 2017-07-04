@@ -24,7 +24,7 @@ func UnRegisterMomoAccounts(req *httpserver.Request) *httpserver.Response {
 		return httpserver.NewResponseWithError(errors.NewBadRequest("NO CITY"))
 	}
 
-	momoAccount, err := adapter.GetNewMomoAccount(province, city, strings.Split(req.RemoteAddr, ":")[0])
+	momoAccount, err := adapter.GetNewMomoAccount(province, city)
 	if err != nil {
 		loggers.Warn.Printf("UnRegisterMomoAccounts get new account error %s", err.Error())
 		if err == errors.NotFound {
@@ -144,6 +144,7 @@ func CompleteMomoAccount(req *httpserver.Request) *httpserver.Response {
 	if momoAccount.Status == 0 {
 		momoAccount.Status = domain.MomoAccountRegistered
 	}
+	momoAccount.RegisterHost = strings.Split(req.RemoteAddr, ":")[0]
 	if err := adapter.CompleteMomoAccount(account, &momoAccount); err != nil {
 		loggers.Warn.Printf("CompleteMomoAccount update momo account error %s", err.Error())
 		return httpserver.NewResponseWithError(errors.InternalServerError)
@@ -187,9 +188,13 @@ func GetMomoAccounts(req *httpserver.Request) *httpserver.Response {
 			param.Offset = i
 		}
 	}
+
 	if v := req.QueryParams.Get("status"); v != "" {
-		if i, err := strconv.Atoi(v); (err == nil) && (i > 0) {
-			param.Status = domain.MomoAccountStatus(i)
+		arrs := strings.Split(v, ",")
+		for _, s := range arrs {
+			if i, err := strconv.Atoi(s); (err == nil) && (i > 0) {
+				param.Status = append(param.Status, domain.MomoAccountStatus(i))
+			}
 		}
 	}
 

@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func GetNewMomoAccount(province, city, remoteAddr string) (*domain.MomoAccount, error) {
+func GetNewMomoAccount(province, city string) (*domain.MomoAccount, error) {
 	db := dbPool.NewConn().Begin()
 	var momoAccount domain.MomoAccount
 	dbResult := db.Where("status = ?", domain.MomoAccountUnRegister).Order("tid").First(&momoAccount)
@@ -28,7 +28,6 @@ func GetNewMomoAccount(province, city, remoteAddr string) (*domain.MomoAccount, 
 	momoAccount.PhotosID = avatar.PhotosID
 	momoAccount.Avatar = avatar.URL
 	momoAccount.Status = domain.MomoAccountLocked
-	momoAccount.RegisterHost = remoteAddr
 	momoAccount.Province = province
 	momoAccount.City = city
 	if err := db.Save(&momoAccount).Error; err != nil {
@@ -40,7 +39,7 @@ func GetNewMomoAccount(province, city, remoteAddr string) (*domain.MomoAccount, 
 }
 
 type AccountQueryParam struct {
-	Status      domain.MomoAccountStatus
+	Status      []domain.MomoAccountStatus
 	Type        domain.MomoAccountType
 	Account     string
 	MomoAccount string
@@ -57,8 +56,8 @@ type AccountQueryParam struct {
 func GetMomoAccounts(param *AccountQueryParam) ([]domain.MomoAccount, error) {
 	var accounts []domain.MomoAccount
 	db := dbPool.NewConn()
-	if param.Status != 0 {
-		db = db.Where("status = ?", param.Status)
+	if param.Status != nil {
+		db = db.Where("status in (?)", param.Status)
 	}
 	if param.Type != 0 {
 		db = db.Where("type = ?", param.Type)
@@ -151,6 +150,7 @@ func CompleteMomoAccount(account string, momoAccount *domain.MomoAccount) error 
 		"momo_account":  momoAccount.MomoAccount,
 		"status":        momoAccount.Status,
 		"register_time": &now,
+		"register_host": momoAccount.RegisterHost,
 	}
 	if err := db.Model(&momoAccount).
 		Where("account = ? and status = ?", account, domain.MomoAccountLocked).
