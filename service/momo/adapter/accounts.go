@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func GetNewMomoAccount(province, city string) (*domain.MomoAccount, error) {
+func GetNewMomoAccount(gps *domain.GPSLocation) (*domain.MomoAccount, error) {
 	db := dbPool.NewConn().Begin()
 	var momoAccount domain.MomoAccount
 	dbResult := db.Where("status = ?", domain.MomoAccountUnRegister).Order("tid").First(&momoAccount)
@@ -28,8 +28,9 @@ func GetNewMomoAccount(province, city string) (*domain.MomoAccount, error) {
 	momoAccount.PhotosID = avatar.PhotosID
 	momoAccount.Avatar = avatar.URL
 	momoAccount.Status = domain.MomoAccountLocked
-	momoAccount.Province = province
-	momoAccount.City = city
+	momoAccount.Province = gps.Province
+	momoAccount.City = gps.City
+	momoAccount.GPSID = gps.GPSID
 	if err := db.Save(&momoAccount).Error; err != nil {
 		db.Rollback()
 		return nil, err

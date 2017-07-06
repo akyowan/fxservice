@@ -24,7 +24,16 @@ func UnRegisterMomoAccounts(req *httpserver.Request) *httpserver.Response {
 		return httpserver.NewResponseWithError(errors.NewBadRequest("NO CITY"))
 	}
 
-	momoAccount, err := adapter.GetNewMomoAccount(province, city)
+	gps, err := adapter.GetRandomGPS(province, city)
+	if err != nil {
+		loggers.Warn.Printf("UnRegisterMomoAccounts get %s:%s gps error %s", province, city, err.Error())
+		if err == errors.NotFound {
+			return httpserver.NewResponseWithError(errors.NewNotFound("NO GPS INFO"))
+		}
+		return httpserver.NewResponseWithError(errors.InternalServerError)
+	}
+
+	momoAccount, err := adapter.GetNewMomoAccount(gps)
 	if err != nil {
 		loggers.Warn.Printf("UnRegisterMomoAccounts get new account error %s", err.Error())
 		if err == errors.NotFound {
@@ -38,15 +47,6 @@ func UnRegisterMomoAccounts(req *httpserver.Request) *httpserver.Response {
 		loggers.Warn.Printf("UnRegisterMomoAccounts get %s device error %s", momoAccount.SN, err.Error())
 		if err == errors.NotFound {
 			return httpserver.NewResponseWithError(errors.NewNotFound("NO DEVICE INFO"))
-		}
-		return httpserver.NewResponseWithError(errors.InternalServerError)
-	}
-
-	gps, err := adapter.GetRandomGPS(province, city)
-	if err != nil {
-		loggers.Warn.Printf("UnRegisterMomoAccounts get %s:%s gps error %s", province, city, err.Error())
-		if err == errors.NotFound {
-			return httpserver.NewResponseWithError(errors.NewNotFound("NO GPS INFO"))
 		}
 		return httpserver.NewResponseWithError(errors.InternalServerError)
 	}

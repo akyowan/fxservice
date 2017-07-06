@@ -1,7 +1,10 @@
 package common
 
 import (
+	"fmt"
+	"fxlibraries/stringhelper"
 	"fxservice/domain"
+	"strings"
 )
 
 func CompletionDevices(devices []domain.Device) {
@@ -36,4 +39,54 @@ func CompletionDevices(devices []domain.Device) {
 			devices[i].DeviceName = GenRandDeviceName()
 		}
 	}
+}
+
+func GenRandIDFA() string {
+	idfa := UUID()
+	return strings.ToUpper(idfa)
+
+}
+
+func GenRandIDFV() string {
+	idfv := UUID()
+	return strings.ToUpper(idfv)
+}
+
+func GenRandIOSVersion() string {
+	return "10.3.1"
+}
+
+func GenRandMac() string {
+	mac := fmt.Sprintf("%s:%s:%s:%s:%s:%s",
+		RandHex(2),
+		RandHex(2),
+		RandHex(2),
+		RandHex(2),
+		RandHex(2),
+		RandHex(2))
+	return mac
+}
+
+func GenRandWifi() string {
+	wifi := fmt.Sprintf("%s:%s:%s:%s:%s:%s",
+		RandHex(2),
+		RandHex(2),
+		RandHex(2),
+		RandHex(2),
+		RandHex(2),
+		RandHex(2))
+
+	return wifi
+}
+
+func GenRandRegion() string {
+	return "CH/A"
+}
+
+func GenRandPassword(n int) string {
+	return stringhelper.GererateHash(n)
+}
+
+func GenRandDeviceName() string {
+	return fmt.Sprintf("%s的iPhone", GenRandName())
 }

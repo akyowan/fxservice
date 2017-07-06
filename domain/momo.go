@@ -22,6 +22,7 @@ type MomoAccount struct {
 	OperatorMN   string            `json:"operator_mn,omitempty"`
 	Province     string            `json:"province,omitempty"`
 	City         string            `json:"city,omitempty"`
+	GPSID        string            `json:"-" gorm:"column:gps_id"`
 	RegisterTime *time.Time        `json:"register_time,omitempty"`
 	RegisterHost string            `json:"register_host,omitempty"`
 	Status       MomoAccountStatus `json:"status"`
@@ -96,6 +97,7 @@ const (
 // GPS信息
 type GPSLocation struct {
 	ID        int64   `json:"-" gorm:"primary_key;column:tid;unique_index:gps_locations_pkey"`
+	GPSID     string  `json:"-" gorm:"column:gps_id"`
 	Longitude float32 `json:"longitude,omitempty"`
 	Latitude  float32 `json:"latitude,omitempty"`
 	Province  string  `json:province,omitempty"`
