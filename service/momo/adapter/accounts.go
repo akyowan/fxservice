@@ -160,3 +160,13 @@ func CompleteMomoAccount(account string, momoAccount *domain.MomoAccount) error 
 	}
 	return nil
 }
+
+type FreeAccountsQueryParam struct {
+	city     string
+	province string
+	count    int
+}
+
+func GetFreeAccounts(param *FreeAccountsQueryParam) ([]domain.MomoAccount, error) {
+	return nil, nil
+}

@@ -247,3 +247,23 @@ func PatchMomoAccounts(req *httpserver.Request) *httpserver.Response {
 	}
 	return httpserver.NewResponse()
 }
+
+func GetFreeAccounts(req *httpserver.Request) *httpserver.Response {
+	//province := req.QueryParams.Get("province")
+	//city := req.QueryParams.Get("city")
+	//countStr := req.QueryParams.Get("count")
+	////var count int
+	//if province == "" {
+	//	loggers.Warn.Printf("GetFreeAccounts no province param")
+	//	return httpserver.NewResponseWithError(errors.ParameterError)
+	//}
+	//if city == "" {
+	//	loggers.Warn.Printf("GetFreeAccounts no city param")
+	//	return httpserver.NewResponseWithError(errors.ParameterError)
+	//}
+	//if countStr == "" {
+	//	count = 10
+	//}
+
+	return httpserver.NewResponse()
+}

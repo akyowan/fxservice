@@ -8,23 +8,28 @@ import (
 	"time"
 )
 
-func AddPhotos(photos [][]domain.Photo) error {
+const MAX_PHOTO_GROUP_RANDOM = 10000000
+
+func AddPhotos(photoGroups [][]domain.Photo) error {
 	db := dbPool.NewConn().Begin()
 	beginID := time.Now().Unix()
-	for i := range photos {
+	rand.Seed(int64(time.Now().Nanosecond()))
+	for i := range photoGroups {
 		beginID += 1
-		photoGroup := photos[i]
+		photos := photoGroups[i]
 		photosID := fmt.Sprintf("%x", beginID)
-		photos := domain.PhotoGroup{
+		random := rand.Intn(MAX_PHOTO_GROUP_RANDOM)
+		photoGroup := domain.PhotoGroup{
 			PhotosID: photosID,
 			Status:   domain.PhotosStatusFree,
+			Random:   random,
 		}
-		if err := db.Create(&photos).Error; err != nil {
+		if err := db.Create(&photoGroup).Error; err != nil {
 			db.Rollback()
 			return err
 		}
-		for j := range photoGroup {
-			photo := photoGroup[j]
+		for j := range photos {
+			photo := photos[j]
 			photo.PhotosID = photosID
 			if err := db.Create(&photo).Error; err != nil {
 				db.Rollback()
@@ -65,7 +70,7 @@ func GetAvatar(photosID string) (string, error) {
 func GetFreeAvatar() (*domain.Photo, error) {
 	db := dbPool.NewConn().Begin()
 	var photoGroup domain.PhotoGroup
-	if err := db.Where("status = ?", domain.PhotosStatusFree).First(&photoGroup).Error; err != nil {
+	if err := db.Where("status = ?", domain.PhotosStatusFree).Order("random").First(&photoGroup).Error; err != nil {
 		db.Rollback()
 		return nil, err
 	}

@@ -112,6 +112,7 @@ func (*GPSLocation) TableName() string {
 type PhotoGroup struct {
 	ID       int64        `json:"-" gorm:"primary_key;column:tid;unique_index:photo_groups_pkey"`
 	PhotosID string       `json:"photos_id" gorm:"unique_index:photos_id_idx"`
+	Random   int          `json:"-" gorm:"index:random_idx"`
 	Status   PhotosStatus `json:"photos_status"`
 }
 
