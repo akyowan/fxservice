@@ -53,12 +53,13 @@ const (
 type MomoAccountStatus int
 
 const (
-	_                     MomoAccountStatus = iota
-	MomoAccountUnRegister                   // 1 未注册
-	MomoAccountRegistered                   // 2 已注册
-	MomoAccountLocked                       // 3 锁定中(正在注册)
-	MomoAccountDisabled                     // 4 被禁用
-	MomoAccountOnline                       // 5 在线中
+	_                            MomoAccountStatus = iota
+	MomoAccountStatusUnRegister                    // 1 未注册
+	MomoAccountStatusFree                          // 2 已注册(可用)
+	MomoAccountStatusRegistering                   // 3 正在注册
+	MomoAccountStatusDisabled                      // 4 被禁用
+	MomoAccountStatusOnline                        // 5 在线中
+	MomoAccountStatusLocked                        // 6 锁定中(正在注册)
 )
 
 // 硬件信息
@@ -100,8 +101,8 @@ type GPSLocation struct {
 	GPSID     string  `json:"-" gorm:"column:gps_id"`
 	Longitude float32 `json:"longitude,omitempty"`
 	Latitude  float32 `json:"latitude,omitempty"`
-	Province  string  `json:province,omitempty"`
-	City      string  `json:city,omitempty"`
+	Province  string  `json:"province,omitempty"`
+	City      string  `json:"city,omitempty"`
 }
 
 func (*GPSLocation) TableName() string {

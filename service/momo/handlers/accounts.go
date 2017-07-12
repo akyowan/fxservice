@@ -113,7 +113,7 @@ func AddAccounts(req *httpserver.Request) *httpserver.Response {
 		accounts[i].OperatorMC = operator.OperatorMC
 		accounts[i].OperatorMN = operator.OperatorMN
 		accounts[i].SN = device.SN
-		accounts[i].Status = domain.MomoAccountUnRegister
+		accounts[i].Status = domain.MomoAccountStatusUnRegister
 		accounts[i].Gender = domain.Female
 		newAccounts = append(newAccounts, accounts[i])
 	}
@@ -142,7 +142,7 @@ func CompleteMomoAccount(req *httpserver.Request) *httpserver.Response {
 		return httpserver.NewResponseWithError(errors.NewBadRequest("no momo account"))
 	}
 	if momoAccount.Status == 0 {
-		momoAccount.Status = domain.MomoAccountRegistered
+		momoAccount.Status = domain.MomoAccountStatusFree
 	}
 	momoAccount.RegisterHost = strings.Split(req.RemoteAddr, ":")[0]
 	if err := adapter.CompleteMomoAccount(account, &momoAccount); err != nil {

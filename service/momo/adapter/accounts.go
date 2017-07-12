@@ -10,7 +10,7 @@ import (
 func GetNewMomoAccount(gps *domain.GPSLocation) (*domain.MomoAccount, error) {
 	db := dbPool.NewConn().Begin()
 	var momoAccount domain.MomoAccount
-	dbResult := db.Where("status = ?", domain.MomoAccountUnRegister).Order("tid").First(&momoAccount)
+	dbResult := db.Where("status = ?", domain.MomoAccountStatusUnRegister).Order("tid").First(&momoAccount)
 	if dbResult.RecordNotFound() {
 		db.Rollback()
 		return nil, errors.NotFound
@@ -27,7 +27,7 @@ func GetNewMomoAccount(gps *domain.GPSLocation) (*domain.MomoAccount, error) {
 
 	momoAccount.PhotosID = avatar.PhotosID
 	momoAccount.Avatar = avatar.URL
-	momoAccount.Status = domain.MomoAccountLocked
+	momoAccount.Status = domain.MomoAccountStatusRegistering
 	momoAccount.Province = gps.Province
 	momoAccount.City = gps.City
 	momoAccount.GPSID = gps.GPSID
@@ -154,7 +154,7 @@ func CompleteMomoAccount(account string, momoAccount *domain.MomoAccount) error 
 		"register_host": momoAccount.RegisterHost,
 	}
 	if err := db.Model(&momoAccount).
-		Where("account = ? and status = ?", account, domain.MomoAccountLocked).
+		Where("account = ? and status = ?", account, domain.MomoAccountStatusRegistering).
 		Updates(updateMap).Error; err != nil {
 		return err
 	}
