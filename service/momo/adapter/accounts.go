@@ -35,7 +35,11 @@ func GetNewMomoAccount(gps *domain.GPSLocation) (*domain.MomoAccount, error) {
 		db.Rollback()
 		return nil, err
 	}
-	db.Commit()
+
+	if err := db.Commit().Error; err != nil {
+		return nil, err
+	}
+
 	return &momoAccount, nil
 }
 
@@ -102,7 +106,11 @@ func AddAccounts(accounts *[]domain.MomoAccount) error {
 			return err
 		}
 	}
-	db.Commit()
+
+	if err := db.Commit().Error; err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -129,7 +137,11 @@ func PatchMomoAccounts(accounts *[]domain.MomoAccount) error {
 			return err
 		}
 	}
-	db.Commit()
+
+	if err := db.Commit().Error; err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -169,10 +181,39 @@ type FreeAccountsQueryParam struct {
 }
 
 func GetFreeAccounts(param *FreeAccountsQueryParam) (*[]domain.MomoAccount, error) {
-	var accounts []domain.MomoAccount
+	accounts := make([]domain.MomoAccount, 0, param.Limit)
 	db := dbPool.NewConn().Begin()
 	db = db.Where("status = ?", domain.MomoAccountStatusFree)
-	dbResult := db.Where("province = ? and city = ?", param.Province, param.City).Limit(param.Limit)
+	dbResult := db.Where("province = ? and city = ?", param.Province, param.City).Limit(param.Limit).Find(&accounts)
+	if dbResult.Error != nil {
+		db.Rollback()
+		return nil, dbResult.Error
+	}
+	if len(accounts) < param.Limit {
+		limit := param.Limit - len(accounts)
+		fillAccounts := make([]domain.MomoAccount, limit)
+		dbResult = db.Where("status = ?", domain.MomoAccountStatusFree).Limit(limit).Find(&fillAccounts)
+		if dbResult.Error != nil {
+			db.Rollback()
+			return nil, dbResult.Error
+		}
+		for i := range fillAccounts {
+			accounts = append(accounts, fillAccounts[i])
+		}
+	}
 
-	return nil, nil
+	for i := range accounts {
+		account := accounts[i]
+		account.Status = domain.MomoAccountStatusLocked
+		if err := db.Model(&account).Update("status", domain.MomoAccountStatusLocked).Error; err != nil {
+			db.Rollback()
+			return nil, err
+		}
+	}
+
+	if err := db.Commit().Error; err != nil {
+		return nil, err
+	}
+
+	return &accounts, nil
 }

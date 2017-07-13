@@ -19,6 +19,7 @@ func Start(addr string) {
 	r.RouteHandleFunc("/accounts", handlers.GetMomoAccounts).Methods("GET")
 	r.RouteHandleFunc("/accounts", handlers.AddAccounts).Methods("POST")
 	r.RouteHandleFunc("/accounts/new", handlers.UnRegisterMomoAccounts).Methods("GET")
+	r.RouteHandleFunc("/accounts", handlers.GetFreeAccounts).Methods("PATCH").Queries("action", "online")
 	r.RouteHandleFunc("/accounts/{account}", handlers.CompleteMomoAccount).Methods("PATCH")
 	r.RouteHandleFunc("/accounts", handlers.PatchMomoAccounts).Methods("PATCH")
 

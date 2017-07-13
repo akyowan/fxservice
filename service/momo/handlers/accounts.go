@@ -119,7 +119,7 @@ func AddAccounts(req *httpserver.Request) *httpserver.Response {
 		accounts[i].Gender = domain.Female
 		newAccounts = append(newAccounts, accounts[i])
 	}
-	if err := adapter.AddAccounts(newAccounts); err != nil {
+	if err := adapter.AddAccounts(&newAccounts); err != nil {
 		loggers.Warn.Printf("AddAccounts error %s", err.Error())
 		return httpserver.NewResponseWithError(errors.InternalServerError)
 	}
@@ -241,7 +241,7 @@ func PatchMomoAccounts(req *httpserver.Request) *httpserver.Response {
 		loggers.Warn.Printf("PatchMomoAccounts parse param error %s", err.Error())
 		return httpserver.NewResponseWithError(errors.ParameterError)
 	}
-	if err := adapter.PatchMomoAccounts(accounts); err != nil {
+	if err := adapter.PatchMomoAccounts(&accounts); err != nil {
 		loggers.Warn.Printf("PatchMomoAccounts error %s", err.Error())
 		return httpserver.NewResponseWithError(errors.ParameterError)
 	}
@@ -265,10 +265,44 @@ func GetFreeAccounts(req *httpserver.Request) *httpserver.Response {
 		Limit:    10,
 	}
 	if v := req.QueryParams.Get("limit"); v != "" {
-		if i, err := strconv.Atoi(v); (err == nil) && (i < 50) && (i > 0) {
+		if i, err := strconv.Atoi(v); (err == nil) && (i <= 50) && (i > 0) {
 			param.Limit = i
 		}
 	}
+	freeAccounts, err := adapter.GetFreeAccounts(&param)
+	if err != nil {
+		loggers.Error.Printf("GetFreeAccounts get free accounts error %s", err.Error())
+		return httpserver.NewResponseWithError(errors.InternalServerError)
+	}
 
-	return httpserver.NewResponse()
+	type Object struct {
+		Profile *domain.MomoAccount `json:"profile"`
+		Device  *domain.Device      `json:"device"`
+		GPS     *domain.GPSLocation `json:"gps"`
+	}
+
+	var data []Object
+	for i := range *freeAccounts {
+		account := (*freeAccounts)[i]
+		device, err := adapter.GetDevice(account.SN)
+		if err != nil {
+			loggers.Error.Printf("GetFreeAccounts get device %s error %s", account.SN, err.Error())
+			return httpserver.NewResponseWithError(errors.InternalServerError)
+		}
+		gps, err := adapter.GetRandomGPS(province, city)
+		if err != nil {
+			loggers.Error.Printf("GetFreeAccounts get gps %s:%s error %s", account.Province, account.City, account.SN, err.Error())
+			return httpserver.NewResponseWithError(errors.InternalServerError)
+		}
+		data = append(data, Object{
+			Profile: &account,
+			Device:  device,
+			GPS:     gps,
+		})
+	}
+
+	resp := httpserver.NewResponse()
+	resp.Data = data
+	return resp
+
 }
