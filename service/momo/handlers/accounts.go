@@ -249,21 +249,26 @@ func PatchMomoAccounts(req *httpserver.Request) *httpserver.Response {
 }
 
 func GetFreeAccounts(req *httpserver.Request) *httpserver.Response {
-	//province := req.QueryParams.Get("province")
-	//city := req.QueryParams.Get("city")
-	//countStr := req.QueryParams.Get("count")
-	////var count int
-	//if province == "" {
-	//	loggers.Warn.Printf("GetFreeAccounts no province param")
-	//	return httpserver.NewResponseWithError(errors.ParameterError)
-	//}
-	//if city == "" {
-	//	loggers.Warn.Printf("GetFreeAccounts no city param")
-	//	return httpserver.NewResponseWithError(errors.ParameterError)
-	//}
-	//if countStr == "" {
-	//	count = 10
-	//}
+	province := req.QueryParams.Get("province")
+	city := req.QueryParams.Get("city")
+	if province == "" {
+		loggers.Warn.Printf("GetFreeAccounts no province param")
+		return httpserver.NewResponseWithError(errors.ParameterError)
+	}
+	if city == "" {
+		loggers.Warn.Printf("GetFreeAccounts no city param")
+		return httpserver.NewResponseWithError(errors.ParameterError)
+	}
+	param := adapter.FreeAccountsQueryParam{
+		Province: province,
+		City:     city,
+		Limit:    10,
+	}
+	if v := req.QueryParams.Get("limit"); v != "" {
+		if i, err := strconv.Atoi(v); (err == nil) && (i < 50) && (i > 0) {
+			param.Limit = i
+		}
+	}
 
 	return httpserver.NewResponse()
 }

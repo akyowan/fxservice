@@ -93,10 +93,11 @@ func GetMomoAccounts(param *AccountQueryParam) ([]domain.MomoAccount, error) {
 	return accounts, nil
 }
 
-func AddAccounts(accounts []domain.MomoAccount) error {
+func AddAccounts(accounts *[]domain.MomoAccount) error {
 	db := dbPool.NewConn().Begin()
-	for i := range accounts {
-		if err := db.Create(&accounts[i]).Error; err != nil {
+	for i := range *accounts {
+		account := (*accounts)[i]
+		if err := db.Create(&account).Error; err != nil {
 			db.Rollback()
 			return err
 		}
@@ -105,23 +106,23 @@ func AddAccounts(accounts []domain.MomoAccount) error {
 	return nil
 }
 
-func PatchMomoAccounts(accounts []domain.MomoAccount) error {
+func PatchMomoAccounts(accounts *[]domain.MomoAccount) error {
 	db := dbPool.NewConn().Begin()
-	for i := range accounts {
-		if accounts[i].Account == "" {
+	for i := range *accounts {
+		if (*accounts)[i].Account == "" {
 			continue
 		}
 		account := domain.MomoAccount{
-			Account: accounts[i].Account,
+			Account: (*accounts)[i].Account,
 		}
-		if accounts[i].Province != "" {
-			account.Province = accounts[i].Province
+		if (*accounts)[i].Province != "" {
+			account.Province = (*accounts)[i].Province
 		}
-		if accounts[i].City != "" {
-			account.City = accounts[i].City
+		if (*accounts)[i].City != "" {
+			account.City = (*accounts)[i].City
 		}
-		if accounts[i].Status != 0 {
-			account.Status = accounts[i].Status
+		if (*accounts)[i].Status != 0 {
+			account.Status = (*accounts)[i].Status
 		}
 		if err := db.Model(&account).Where("account = ?", account.Account).UpdateColumns(account).Error; err != nil {
 			db.Rollback()
@@ -162,11 +163,16 @@ func CompleteMomoAccount(account string, momoAccount *domain.MomoAccount) error 
 }
 
 type FreeAccountsQueryParam struct {
-	city     string
-	province string
-	count    int
+	City     string
+	Province string
+	Limit    int
 }
 
-func GetFreeAccounts(param *FreeAccountsQueryParam) ([]domain.MomoAccount, error) {
+func GetFreeAccounts(param *FreeAccountsQueryParam) (*[]domain.MomoAccount, error) {
+	var accounts []domain.MomoAccount
+	db := dbPool.NewConn().Begin()
+	db = db.Where("status = ?", domain.MomoAccountStatusFree)
+	dbResult := db.Where("province = ? and city = ?", param.Province, param.City).Limit(param.Limit)
+
 	return nil, nil
 }
