@@ -306,3 +306,22 @@ func GetFreeAccounts(req *httpserver.Request) *httpserver.Response {
 	return resp
 
 }
+
+func GetAccountReply(req *httpserver.Request) *httpserver.Response {
+	account := req.UrlParams["account"]
+	if account == "" {
+		loggers.Warn.Printf("GetAccountReply no account")
+		return httpserver.NewResponseWithError(errors.ParameterError)
+	}
+	reply, err := adapter.GetAccountReply(account)
+	reply.CreatedAt = nil
+	reply.UpdatedAt = nil
+	if err != nil {
+		loggers.Warn.Printf("GetAccountReply error %s", err.Error())
+		return httpserver.NewResponseWithError(errors.NotFound)
+	}
+
+	resp := httpserver.NewResponse()
+	resp.Data = reply
+	return resp
+}

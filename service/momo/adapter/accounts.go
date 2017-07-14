@@ -217,3 +217,38 @@ func GetFreeAccounts(param *FreeAccountsQueryParam) (*[]domain.MomoAccount, erro
 
 	return &accounts, nil
 }
+
+func GetAccountReply(account string) (*domain.Reply, error) {
+	var momoAccount domain.MomoAccount
+	var reply domain.Reply
+	db := dbPool.NewConn().Begin()
+	if err := db.Where("account = ?", account).First(&momoAccount).Error; err != nil {
+		db.Rollback()
+		return nil, err
+	}
+	db = db.Where("free > 0").Where("status = ?", domain.ReplyStatusEnable)
+	if err := db.Order("priority desc").Limit(1).First(&reply).Error; err != nil {
+		db.Rollback()
+		return nil, err
+	}
+	reply.Used = reply.Used + 1
+	reply.Free = reply.Free - 1
+	if err := db.Save(&reply).Error; err != nil {
+		db.Rollback()
+		return nil, err
+	}
+	accountReply := domain.AccountReply{
+		Account:     momoAccount.Account,
+		AccountType: momoAccount.AccountType,
+		ReplyID:     reply.ReplyID,
+	}
+	if err := db.Create(&accountReply).Error; err != nil {
+		db.Rollback()
+		return nil, err
+	}
+	if err := db.Commit().Error; err != nil {
+		return nil, err
+	}
+
+	return &reply, nil
+}

@@ -149,3 +149,52 @@ type NickName struct {
 func (*NickName) TableName() string {
 	return "nick_names"
 }
+
+// Reply
+type Reply struct {
+	ID        int64      `json:"-" gorm:"primary_key;column:tid;unique_index:photos_pkey"`
+	ReplyID   string     `json:"reply_id"`
+	ReplyType int        `json:"reply_type"`
+	Content   string     `json:"content"`
+	Used      int        `json:"-"`
+	Free      int        `json:"-"`
+	Priority  int        `json:"-"`
+	Group     string     `json:"-"`
+	Status    int        `json:"-"`
+	CreatedAt *time.Time `json:"create_time,omitempty" gorm:"column:create_time"`
+	UpdatedAt *time.Time `json:"update_time,omitempty" gorm:"column:update_time"`
+}
+
+func (*Reply) TableName() string {
+	return "replys"
+}
+
+type ReplyType int
+
+const (
+	_ ReplyType = iota
+	ReplyTypeWord
+	ReplyTypePhoto
+)
+
+type ReplyStatus int
+
+const (
+	_ ReplyStatus = iota
+	ReplyStatusEnable
+	ReplyStatusDisable
+)
+
+// AccountReply
+type AccountReply struct {
+	ID          int64           `json:"-" gorm:"primary_key;column:tid;unique_index:photos_pkey"`
+	Account     string          `json:"account"`
+	AccountType MomoAccountType `json:"account_type"`
+	ReplyID     string          `json:"reply_id"`
+	CreatedAt   *time.Time      `json:"create_time,omitempty" gorm:"column:create_time"`
+	UpdatedAt   *time.Time      `json:"update_time,omitempty" gorm:"column:update_time"`
+}
+
+func (*AccountReply) TableName() string {
+	return "account_replys"
+}
