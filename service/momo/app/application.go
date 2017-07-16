@@ -16,12 +16,14 @@ func Start(addr string) {
 	r := httpserver.NewRouter()
 	r.RouteHandleFunc("/status", handlers.Test).Methods("GET")
 
+	r.RouteHandleFunc("/accounts", handlers.GetFreeAccounts).Methods("GET").Queries("action", "online")
 	r.RouteHandleFunc("/accounts", handlers.GetMomoAccounts).Methods("GET")
 	r.RouteHandleFunc("/accounts", handlers.AddAccounts).Methods("POST")
-	r.RouteHandleFunc("/accounts/new", handlers.UnRegisterMomoAccounts).Methods("GET")
 	r.RouteHandleFunc("/accounts", handlers.GetFreeAccounts).Methods("PATCH").Queries("action", "online")
-	r.RouteHandleFunc("/accounts/{account}", handlers.CompleteMomoAccount).Methods("PATCH")
 	r.RouteHandleFunc("/accounts", handlers.PatchMomoAccounts).Methods("PATCH")
+
+	r.RouteHandleFunc("/accounts/new", handlers.UnRegisterMomoAccounts).Methods("GET")
+	r.RouteHandleFunc("/accounts/{account}", handlers.CompleteMomoAccount).Methods("PATCH")
 
 	r.RouteHandleFunc("/replys/{account}", handlers.GetAccountReply).Methods("GET")
 
