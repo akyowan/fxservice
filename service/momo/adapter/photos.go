@@ -1,24 +1,24 @@
 package adapter
 
 import (
-	"fmt"
 	"fxlibraries/errors"
 	"fxservice/domain"
+	"fxservice/service/momo/common"
 	"math/rand"
 	"time"
 )
 
 const MAX_PHOTO_GROUP_RANDOM = 10000000
+const PHOTOS_ID_KEY = "PHOTO_GROUP"
 
 func AddPhotos(photoGroups [][]domain.Photo) error {
 	db := dbPool.NewConn().Begin()
-	beginID := time.Now().Unix()
 	rand.Seed(int64(time.Now().Nanosecond()))
 	for i := range photoGroups {
-		beginID += 1
 		photos := photoGroups[i]
-		photosID := fmt.Sprintf("%x", beginID)
+		photosID := common.GenerateID8(PHOTOS_ID_KEY)
 		random := rand.Intn(MAX_PHOTO_GROUP_RANDOM)
+
 		photoGroup := domain.PhotoGroup{
 			PhotosID: photosID,
 			Status:   domain.PhotosStatusFree,
@@ -86,10 +86,4 @@ func GetFreeAvatar() (*domain.Photo, error) {
 	}
 	db.Commit()
 	return &photo, nil
-}
-
-func GetRandomPhotosID() string {
-	rand.Seed(int64(time.Now().Nanosecond()))
-	id := rand.Intn(230) + 1000
-	return fmt.Sprintf("%d", id)
 }

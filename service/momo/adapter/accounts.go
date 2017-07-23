@@ -177,12 +177,16 @@ func CompleteMomoAccount(account string, momoAccount *domain.MomoAccount) error 
 type FreeAccountsQueryParam struct {
 	City     string
 	Province string
+	Account  string
 	Limit    int
 }
 
 func GetFreeAccounts(param *FreeAccountsQueryParam) (*[]domain.MomoAccount, error) {
 	accounts := make([]domain.MomoAccount, 0, param.Limit)
 	db := dbPool.NewConn().Begin()
+	if param.Account != "" {
+		db = db.Where("account = ?", param.Account)
+	}
 	db = db.Where("status = ?", domain.MomoAccountStatusFree)
 	dbResult := db.Where("province = ? and city = ?", param.Province, param.City).Limit(param.Limit).Find(&accounts)
 	if dbResult.Error != nil {

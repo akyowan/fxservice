@@ -1,11 +1,11 @@
 package app
 
 import (
-	"fxservice/service/momo/handlers"
-
 	"fxlibraries/httpserver"
 	"fxlibraries/loggers"
-	//"fxlibraries/errors"
+
+	"fxservice/service/momo/common"
+	"fxservice/service/momo/handlers"
 )
 
 func init() {
@@ -13,6 +13,23 @@ func init() {
 }
 
 func Start(addr string) {
+
+	for i := 0; i < 10; i++ {
+		loggers.Debug.Printf("%s\n", common.GenerateID8("TEST"))
+	}
+
+	for i := 0; i < 10; i++ {
+		loggers.Debug.Printf("%s\n", common.GenerateID16("TEST"))
+	}
+
+	for i := 0; i < 10; i++ {
+		loggers.Debug.Printf("%s\n", common.GenerateID8("ATEST"))
+	}
+
+	for i := 0; i < 10; i++ {
+		loggers.Debug.Printf("%s\n", common.GenerateID16("BTEST"))
+	}
+
 	r := httpserver.NewRouter()
 	r.RouteHandleFunc("/status", handlers.Test).Methods("GET")
 

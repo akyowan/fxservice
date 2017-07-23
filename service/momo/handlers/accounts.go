@@ -251,6 +251,7 @@ func PatchMomoAccounts(req *httpserver.Request) *httpserver.Response {
 func GetFreeAccounts(req *httpserver.Request) *httpserver.Response {
 	province := req.QueryParams.Get("province")
 	city := req.QueryParams.Get("city")
+	account := req.QueryParams.Get("account")
 	if province == "" {
 		loggers.Warn.Printf("GetFreeAccounts no province param")
 		return httpserver.NewResponseWithError(errors.ParameterError)
@@ -262,6 +263,7 @@ func GetFreeAccounts(req *httpserver.Request) *httpserver.Response {
 	param := adapter.FreeAccountsQueryParam{
 		Province: province,
 		City:     city,
+		Account:  account,
 		Limit:    10,
 	}
 	if v := req.QueryParams.Get("limit"); v != "" {
@@ -279,6 +281,7 @@ func GetFreeAccounts(req *httpserver.Request) *httpserver.Response {
 		Profile *domain.MomoAccount `json:"profile"`
 		Device  *domain.Device      `json:"device"`
 		GPS     *domain.GPSLocation `json:"gps"`
+		RGPS    *domain.GPSLocation `json:"reg_gps,omitempty"`
 	}
 
 	var data []Object
@@ -294,11 +297,21 @@ func GetFreeAccounts(req *httpserver.Request) *httpserver.Response {
 			loggers.Error.Printf("GetFreeAccounts get gps %s:%s error %s", account.Province, account.City, account.SN, err.Error())
 			return httpserver.NewResponseWithError(errors.InternalServerError)
 		}
-		data = append(data, Object{
+		obj := Object{
 			Profile: &account,
 			Device:  device,
 			GPS:     gps,
-		})
+		}
+
+		if account.GPSID != "" {
+			rgps, err := adapter.GetGPS(account.GPSID)
+			if err != nil {
+				loggers.Error.Printf("GetFreeAccounts get register gps %s error %s ", account.GPSID, err.Error())
+				return httpserver.NewResponseWithError(errors.InternalServerError)
+			}
+			obj.RGPS = rgps
+		}
+		data = append(data, obj)
 	}
 
 	resp := httpserver.NewResponse()

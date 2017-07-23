@@ -11,6 +11,7 @@ type DatabaseConf struct {
 type RedisConf struct {
 	Host string
 	Port string
+	DB   int
 }
 
 type ServerConf struct {
