@@ -41,8 +41,6 @@ func UnRegisterMomoAccounts(req *httpserver.Request) *httpserver.Response {
 		}
 		return httpserver.NewResponseWithError(errors.InternalServerError)
 	}
-	gps.Latitude = gps.Latitude + common.RandGPSOffset()
-	gps.Longitude = gps.Longitude + common.RandGPSOffset()
 
 	device, err := adapter.GetDevice(momoAccount.SN)
 	if err != nil {

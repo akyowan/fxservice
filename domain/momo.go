@@ -103,11 +103,20 @@ type GPSLocation struct {
 	Latitude  float32 `json:"latitude,omitempty"`
 	Province  string  `json:"province,omitempty"`
 	City      string  `json:"city,omitempty"`
+	Type      GPSType `json:"type,omitempty"`
 }
 
 func (*GPSLocation) TableName() string {
 	return "gpss"
 }
+
+type GPSType int
+
+const (
+	_ GPSType = iota
+	GPSTypeNormal
+	GPSTypeCentral
+)
 
 type PhotoGroup struct {
 	ID       int64        `json:"-" gorm:"primary_key;column:tid;unique_index:photo_groups_pkey"`

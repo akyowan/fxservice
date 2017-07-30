@@ -13,19 +13,40 @@ const GPS_ID_KEY = "GPS"
 func GetRandomGPS(province, city string) (*domain.GPSLocation, error) {
 	db := dbPool.NewConn()
 	var gpss []domain.GPSLocation
-	dbResult := db.Where("province = ?", province).Where("city = ?", city).Find(&gpss)
+	dbResult := db.Where("province = ?", province).Where("city = ?", city).Where("type = ?", domain.GPSTypeNormal).Find(&gpss)
 	if dbResult.RecordNotFound() {
-		return nil, errors.NotFound
+		dbResult := db.Where("province = ?", province).Where("city = ?", city).Where("type = ?", domain.GPSTypeCentral).Find(&gpss)
+		if dbResult.RecordNotFound() {
+			return nil, errors.NotFound
+		}
+		if dbResult.Error != nil {
+			return nil, dbResult.Error
+		}
+	}
+	if dbResult.Error != nil {
+		return nil, dbResult.Error
 	}
 	rand.Seed(int64(time.Now().Nanosecond()))
 	index := rand.Intn(len(gpss))
-	return &gpss[index], nil
+	gps := gpss[index]
+	if gps.Type == domain.GPSTypeCentral {
+		gps.Latitude += common.RandGPSCentralOffset()
+		gps.Longitude += common.RandGPSCentralOffset()
+	} else {
+		gps.Latitude += common.RandGPSOffset()
+		gps.Longitude += common.RandGPSOffset()
+	}
+
+	return &gps, nil
 }
 
 func AddGpss(gpss []domain.GPSLocation) error {
 	db := dbPool.NewConn().Begin()
 	for i := range gpss {
 		gpss[i].GPSID = common.GenerateID8(GPS_ID_KEY)
+		if gpss[i].Type == 0 {
+			gpss[i].Type = domain.GPSTypeNormal
+		}
 		if err := db.Create(&gpss[i]).Error; err != nil {
 			db.Rollback()
 			return err
