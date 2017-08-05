@@ -2,7 +2,7 @@ package adapter
 
 import (
 	"fxlibraries/mysql"
-	"fxservice/service/momo/config"
+	"fxservice/service/chat/config"
 )
 
 var dbPool *mysql.DBPool

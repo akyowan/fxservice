@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fxservice/service/momo/app"
-	"fxservice/service/momo/config"
+	"fxservice/service/chat/app"
+	"fxservice/service/chat/config"
 )
 
 func main() {

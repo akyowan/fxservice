@@ -3,7 +3,7 @@ package adapter
 import (
 	"fxlibraries/errors"
 	"fxservice/domain"
-	"fxservice/service/momo/common"
+	"fxservice/service/chat/common"
 	"math/rand"
 	"time"
 )

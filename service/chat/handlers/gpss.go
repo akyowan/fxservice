@@ -5,7 +5,7 @@ import (
 	"fxlibraries/httpserver"
 	"fxlibraries/loggers"
 	"fxservice/domain"
-	"fxservice/service/momo/adapter"
+	"fxservice/service/chat/adapter"
 )
 
 func AddGPSs(req *httpserver.Request) *httpserver.Response {

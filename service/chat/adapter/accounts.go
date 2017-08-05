@@ -241,7 +241,7 @@ func GetAccountReply(account string) (*domain.Reply, error) {
 		db.Rollback()
 		return nil, err
 	}
-	accountReply := domain.AccountReply{
+	accountReply := domain.MomoReply{
 		Account:     momoAccount.Account,
 		AccountType: momoAccount.AccountType,
 		ReplyID:     reply.ReplyID,

@@ -5,8 +5,8 @@ import (
 	"fxlibraries/httpserver"
 	"fxlibraries/loggers"
 	"fxservice/domain"
-	"fxservice/service/momo/adapter"
-	"fxservice/service/momo/common"
+	"fxservice/service/chat/adapter"
+	"fxservice/service/chat/common"
 )
 
 func AddDevices(req *httpserver.Request) *httpserver.Response {

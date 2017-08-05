@@ -3,7 +3,7 @@ package common
 import (
 	"fmt"
 	"fxlibraries/redis"
-	"fxservice/service/momo/config"
+	"fxservice/service/chat/config"
 )
 
 var client redis.Client
