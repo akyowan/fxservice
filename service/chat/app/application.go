@@ -14,17 +14,18 @@ func init() {
 func Start(addr string) {
 	r := httpserver.NewRouter()
 	r.RouteHandleFunc("/status", handlers.Test).Methods("GET")
+	r.RouteHandleFunc("/accounts", handlers.AddAccounts).Methods("POST")
 
 	r.RouteHandleFunc("/accounts", handlers.GetFreeMomoAccounts).Methods("GET").Queries("action", "online")
 	r.RouteHandleFunc("/accounts", handlers.GetMomoAccounts).Methods("GET")
-	r.RouteHandleFunc("/accounts", handlers.AddAccounts).Methods("POST")
 	r.RouteHandleFunc("/accounts", handlers.GetFreeMomoAccounts).Methods("PATCH").Queries("action", "online")
 	r.RouteHandleFunc("/accounts", handlers.PatchMomoAccounts).Methods("PATCH")
 
 	r.RouteHandleFunc("/accounts/new", handlers.UnRegisterMomoAccounts).Methods("GET")
 	r.RouteHandleFunc("/accounts/{account}", handlers.CompleteMomoAccount).Methods("PATCH")
-
 	r.RouteHandleFunc("/replys/{account}", handlers.GetMomoAccountReply).Methods("GET")
+
+	r.RouteHandleFunc("/tantan/accounts", handlers.UnRegisterTantanAccounts).Methods("GET")
 
 	r.RouteHandleFunc("/gpss", handlers.AddGPSs).Methods("POST")
 	r.RouteHandleFunc("/photos", handlers.AddPhotos).Methods("POST")
