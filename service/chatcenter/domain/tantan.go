@@ -6,10 +6,10 @@ import (
 
 // tantan账号信息
 type TantanAccount struct {
-	ID           int64         `json:"-" gorm:"primary_key;column:tid;unique_index:tantan_account_pkey"`
-	Account      string        `json:"account,omitempty" gorm:"no null"`
-	AccountType  AccountType   `json:"account_type,omitempty"`
-	Password     string        `json:"password,omitempty"`
+	ID           int64         `json:"id" gorm:"primary_key;column:tid;unique_index:tantan_account_pkey"`
+	Account      string        `json:"account,omitempty" gorm:"default:NULL"`
+	AccountType  AccountType   `json:"account_type,omitempty" gorm:"default:NULL"`
+	Password     string        `json:"password,omitempty" gorm:"default:NULL"`
 	Avatar       string        `json:"avatar,omitempty"`
 	PhotosID     string        `json:"photos_id,omitempty"`
 	Gender       GenderType    `json:"gender,omitempty"`

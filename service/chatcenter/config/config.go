@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"fxservice/domain"
+	"fxservice/service/chatcenter/domain"
 	"os"
 )
 

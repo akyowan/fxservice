@@ -2,7 +2,7 @@ package adapter
 
 import (
 	"fxlibraries/errors"
-	"fxservice/domain"
+	"fxservice/service/chatcenter/domain"
 	"time"
 )
 

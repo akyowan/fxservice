@@ -2,8 +2,8 @@ package adapter
 
 import (
 	"fxlibraries/errors"
-	"fxservice/domain"
-	"fxservice/service/chat/common"
+	"fxservice/service/chatcenter/common"
+	"fxservice/service/chatcenter/domain"
 	"math/rand"
 	"time"
 )
@@ -14,9 +14,9 @@ func GetRandomGPS(province, city string) (*domain.GPSLocation, error) {
 	db := dbPool.NewConn()
 	var gpss []domain.GPSLocation
 	dbResult := db.Where("province = ?", province).Where("city = ?", city).Where("type = ?", domain.GPSTypeNormal).Find(&gpss)
-	if dbResult.RecordNotFound() {
+	if dbResult.RecordNotFound() || (len(gpss) == 0) {
 		dbResult := db.Where("province = ?", province).Where("city = ?", city).Where("type = ?", domain.GPSTypeCentral).Find(&gpss)
-		if dbResult.RecordNotFound() {
+		if dbResult.RecordNotFound() || (len(gpss) == 0) {
 			return nil, errors.NotFound
 		}
 		if dbResult.Error != nil {

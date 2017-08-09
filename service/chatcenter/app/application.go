@@ -4,7 +4,7 @@ import (
 	"fxlibraries/httpserver"
 	"fxlibraries/loggers"
 
-	"fxservice/service/chat/handlers"
+	"fxservice/service/chatcenter/handlers"
 )
 
 func init() {
@@ -25,11 +25,11 @@ func Start(addr string) {
 	r.RouteHandleFunc("/accounts/{account}", handlers.CompleteMomoAccount).Methods("PATCH")
 	r.RouteHandleFunc("/replys/{account}", handlers.GetMomoAccountReply).Methods("GET")
 
-	r.RouteHandleFunc("/tantan/accounts", handlers.UnRegisterTantanAccounts).Methods("GET")
-
 	r.RouteHandleFunc("/gpss", handlers.AddGPSs).Methods("POST")
 	r.RouteHandleFunc("/photos", handlers.AddPhotos).Methods("POST")
 	r.RouteHandleFunc("/devices", handlers.AddDevices).Methods("POST")
+
+	r.RouteHandleFunc("/tantan/accounts/new", handlers.UnRegisterTantanAccounts).Methods("GET")
 
 	loggers.Info.Printf("Starting User Center External Service [\033[0;32;1mOK\t%+v\033[0m] \n", addr)
 	panic(r.ListenAndServe(addr))

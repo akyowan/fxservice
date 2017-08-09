@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fxservice/service/chat/app"
-	"fxservice/service/chat/config"
+	"fxservice/service/chatcenter/app"
+	"fxservice/service/chatcenter/config"
 )
 
 func main() {
