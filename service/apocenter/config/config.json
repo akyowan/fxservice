@@ -1,0 +1,17 @@
+{
+   "RedisConf" : {
+      "Host" : "localhost",
+      "Port" : "6379"
+   },
+   "ServerConf" : {
+      "ExternalListenAddress" : ":19801",
+      "InternalListenAddress" : ":19802"
+   },
+   "DBConf" : {
+      "DBName" : "momo",
+      "Host" : "192.168.1.103",
+      "Port" : 3306,
+      "Password" : "koudai123456",
+      "User" : "wans"
+   }
+}
