@@ -4,9 +4,9 @@ import (
 	"fxlibraries/errors"
 	"fxlibraries/httpserver"
 	"fxlibraries/loggers"
-	"fxservice/domain"
-	"fxservice/service/momo/adapter"
-	"fxservice/service/momo/common"
+	"fxservice/service/chatcenter/adapter"
+	"fxservice/service/chatcenter/common"
+	"fxservice/service/chatcenter/domain"
 )
 
 func AddDevices(req *httpserver.Request) *httpserver.Response {

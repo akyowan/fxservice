@@ -3,7 +3,7 @@ package common
 import (
 	"fmt"
 	"fxlibraries/stringhelper"
-	"fxservice/domain"
+	"fxservice/service/chatcenter/domain"
 	"strings"
 )
 

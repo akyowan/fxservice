@@ -4,8 +4,8 @@ import (
 	"fxlibraries/errors"
 	"fxlibraries/httpserver"
 	"fxlibraries/loggers"
-	"fxservice/domain"
-	"fxservice/service/momo/adapter"
+	"fxservice/service/chatcenter/adapter"
+	"fxservice/service/chatcenter/domain"
 )
 
 func AddPhotos(req *httpserver.Request) *httpserver.Response {

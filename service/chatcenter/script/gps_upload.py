@@ -27,8 +27,7 @@ def UploadGpss():
         longitude = float(arr[2].strip())
         latitude = float(arr[3].strip())
         gpss.append({"longitude":longitude, "latitude":latitude, "province":province, "city":city, "type":gpsType})
-    #api = "http://apo.kdzs123.com:8060/gpss"
-    api = "http://192.168.1.103:19802/gpss"
+    api = "http://api.kdzs123.com:8060/gpss"
     r = requests.post(api, data=json.dumps(gpss))
     print r.text
 UploadGpss()

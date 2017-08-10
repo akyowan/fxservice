@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"fxservice/domain"
+	"fxservice/service/chatcenter/domain"
 	"os"
 )
 
@@ -21,7 +21,7 @@ var (
 )
 
 var (
-	configFilePath = flag.String("c", "/etc/fxservice/momo/config.json", "config file path")
+	configFilePath = flag.String("c", "/etc/fxservice/chat/config.json", "config file path")
 	isDebug        = flag.Bool("d", false, "debug mode")
 	isLocal        = flag.Bool("local", false, "local develop mode")
 )

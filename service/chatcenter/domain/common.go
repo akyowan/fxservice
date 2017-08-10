@@ -4,64 +4,6 @@ import (
 	"time"
 )
 
-// 陌陌账号信息
-type MomoAccount struct {
-	ID           int64             `json:"-" gorm:"primary_key;column:tid;unique_index:momo_account_pkey"`
-	Account      string            `json:"account,omitempty" gorm:"no null"`
-	AccountType  MomoAccountType   `json:"account_type,omitempty"`
-	Password     string            `json:"password,omitempty"`
-	MomoAccount  string            `json:"momo_account,omitempty"`
-	MomoPassword string            `json:"momo_password,omitempty"`
-	Avatar       string            `json:"avatar,omitempty"`
-	PhotosID     string            `json:"photos_id,omitempty"`
-	Gender       GenderType        `json:"gender,omitempty"`
-	NickName     string            `json:"nick_name,omitempty"`
-	SN           string            `json:"sn,omitempty"`
-	Operator     string            `json:"operator,omitempty"`
-	OperatorMC   string            `json:"operator_mc,omitempty"`
-	OperatorMN   string            `json:"operator_mn,omitempty"`
-	Province     string            `json:"province,omitempty"`
-	City         string            `json:"city,omitempty"`
-	GPSID        string            `json:"-" gorm:"column:gps_id"`
-	RegisterTime *time.Time        `json:"register_time,omitempty"`
-	RegisterHost string            `json:"register_host,omitempty"`
-	Status       MomoAccountStatus `json:"status"`
-	CreatedAt    *time.Time        `json:"create_time,omitempty" gorm:"column:create_time"`
-	UpdatedAt    *time.Time        `json:"update_time,omitempty" gorm:"column:update_time"`
-}
-
-func (*MomoAccount) TableName() string {
-	return "momo_accounts"
-}
-
-type MomoAccountType int
-
-const (
-	_     MomoAccountType = iota
-	QQ                    // 1 QQ账号
-	Phone                 // 2 手机账号
-)
-
-type GenderType int
-
-const (
-	_      GenderType = iota
-	Man               // 1 男
-	Female            // 2 女
-)
-
-type MomoAccountStatus int
-
-const (
-	_                            MomoAccountStatus = iota
-	MomoAccountStatusUnRegister                    // 1 未注册
-	MomoAccountStatusFree                          // 2 已注册(可用)
-	MomoAccountStatusRegistering                   // 3 正在注册
-	MomoAccountStatusDisabled                      // 4 被禁用
-	MomoAccountStatusOnline                        // 5 在线中
-	MomoAccountStatusLocked                        // 6 锁定中(正在注册)
-)
-
 // 硬件信息
 type Device struct {
 	ID         int64        `json:"-" gorm:"primary_key;column:tid;unique_index:devices_pkey"`
@@ -121,6 +63,7 @@ const (
 type PhotoGroup struct {
 	ID       int64        `json:"-" gorm:"primary_key;column:tid;unique_index:photo_groups_pkey"`
 	PhotosID string       `json:"photos_id" gorm:"unique_index:photos_id_idx"`
+	Chat     ChatType     `json:"chat"`
 	Random   int          `json:"-" gorm:"index:random_idx"`
 	Status   PhotosStatus `json:"photos_status"`
 }
@@ -151,7 +94,7 @@ func (*Photo) TableName() string {
 }
 
 type NickName struct {
-	ID       int64  `json:"-" gorm:"primary_key;column:tid;unique_index:momo_photos"`
+	ID       int64  `json:"-" gorm:"primary_key;column:tid;unique_index:nick_names_pkey"`
 	NickName string `json:"-"`
 }
 
@@ -161,8 +104,9 @@ func (*NickName) TableName() string {
 
 // Reply
 type Reply struct {
-	ID        int64      `json:"-" gorm:"primary_key;column:tid;unique_index:photos_pkey"`
+	ID        int64      `json:"-" gorm:"primary_key;column:tid;unique_index:replys_pkey"`
 	ReplyID   string     `json:"reply_id"`
+	Chat      ChatType   `json:"chat"`
 	ReplyType int        `json:"reply_type"`
 	Content   string     `json:"content"`
 	Used      int        `json:"-"`
@@ -194,16 +138,54 @@ const (
 	ReplyStatusDisable
 )
 
+type AccountType int
+
+const (
+	_     AccountType = iota
+	QQ                // 1 QQ账号
+	Phone             // 2 手机账号
+)
+
+type GenderType int
+
+const (
+	_      GenderType = iota
+	Man               // 1 男
+	Female            // 2 女
+)
+
+type AccountStatus int
+
+const (
+	_                        AccountStatus = iota
+	AccountStatusUnRegister                // 1 未注册
+	AccountStatusFree                      // 2 已注册(可用)
+	AccountStatusRegistering               // 3 正在注册
+	AccountStatusDisabled                  // 4 被禁用
+	AccountStatusOnline                    // 5 在线中
+	AccountStatusLocked                    // 6 锁定中(正在注册)
+)
+
 // AccountReply
-type AccountReply struct {
-	ID          int64           `json:"-" gorm:"primary_key;column:tid;unique_index:photos_pkey"`
-	Account     string          `json:"account"`
-	AccountType MomoAccountType `json:"account_type"`
-	ReplyID     string          `json:"reply_id"`
-	CreatedAt   *time.Time      `json:"create_time,omitempty" gorm:"column:create_time"`
-	UpdatedAt   *time.Time      `json:"update_time,omitempty" gorm:"column:update_time"`
+type ChatReply struct {
+	ID          int64       `json:"-" gorm:"primary_key;column:tid;unique_index:photos_pkey"`
+	Account     string      `json:"account"`
+	AccountType AccountType `json:"account_type"`
+	Chat        ChatType    `json:"chat"`
+	ReplyID     string      `json:"reply_id"`
+	CreatedAt   *time.Time  `json:"create_time,omitempty" gorm:"column:create_time"`
+	UpdatedAt   *time.Time  `json:"update_time,omitempty" gorm:"column:update_time"`
 }
 
-func (*AccountReply) TableName() string {
-	return "account_replys"
+func (*ChatReply) TableName() string {
+	return "chat_replys"
 }
+
+type ChatType int
+
+const (
+	_ ChatType = iota
+	ChatTypeCommon
+	ChatTypeMomo
+	ChatTypeTantan
+)

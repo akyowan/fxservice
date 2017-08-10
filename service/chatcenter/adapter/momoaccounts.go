@@ -2,15 +2,14 @@ package adapter
 
 import (
 	"fxlibraries/errors"
-	"fxservice/domain"
-	"math/rand"
+	"fxservice/service/chatcenter/domain"
 	"time"
 )
 
 func GetNewMomoAccount(gps *domain.GPSLocation) (*domain.MomoAccount, error) {
 	db := dbPool.NewConn().Begin()
 	var momoAccount domain.MomoAccount
-	dbResult := db.Where("status = ?", domain.MomoAccountStatusUnRegister).Order("tid").First(&momoAccount)
+	dbResult := db.Where("status = ?", domain.AccountStatusUnRegister).Order("tid").First(&momoAccount)
 	if dbResult.RecordNotFound() {
 		db.Rollback()
 		return nil, errors.NotFound
@@ -27,7 +26,7 @@ func GetNewMomoAccount(gps *domain.GPSLocation) (*domain.MomoAccount, error) {
 
 	momoAccount.PhotosID = avatar.PhotosID
 	momoAccount.Avatar = avatar.URL
-	momoAccount.Status = domain.MomoAccountStatusRegistering
+	momoAccount.Status = domain.AccountStatusRegistering
 	momoAccount.Province = gps.Province
 	momoAccount.City = gps.City
 	momoAccount.GPSID = gps.GPSID
@@ -44,8 +43,8 @@ func GetNewMomoAccount(gps *domain.GPSLocation) (*domain.MomoAccount, error) {
 }
 
 type AccountQueryParam struct {
-	Status      []domain.MomoAccountStatus
-	Type        domain.MomoAccountType
+	Status      []domain.AccountStatus
+	Type        domain.AccountType
 	Account     string
 	MomoAccount string
 	Gender      domain.GenderType
@@ -145,18 +144,6 @@ func PatchMomoAccounts(accounts *[]domain.MomoAccount) error {
 	return nil
 }
 
-func GetRandNickName() (*domain.NickName, error) {
-	db := dbPool.NewConn()
-	var nickNames []domain.NickName
-	dbResult := db.Find(&nickNames)
-	if dbResult.RecordNotFound() {
-		return nil, errors.NotFound
-	}
-	rand.Seed(int64(time.Now().Nanosecond()))
-	index := rand.Intn(len(nickNames))
-	return &nickNames[index], nil
-}
-
 func CompleteMomoAccount(account string, momoAccount *domain.MomoAccount) error {
 	db := dbPool.NewConn()
 	now := time.Now()
@@ -167,7 +154,7 @@ func CompleteMomoAccount(account string, momoAccount *domain.MomoAccount) error 
 		"register_host": momoAccount.RegisterHost,
 	}
 	if err := db.Model(&momoAccount).
-		Where("account = ? and status = ?", account, domain.MomoAccountStatusRegistering).
+		Where("account = ? and status = ?", account, domain.AccountStatusRegistering).
 		Updates(updateMap).Error; err != nil {
 		return err
 	}
@@ -181,13 +168,13 @@ type FreeAccountsQueryParam struct {
 	Limit    int
 }
 
-func GetFreeAccounts(param *FreeAccountsQueryParam) (*[]domain.MomoAccount, error) {
+func GetMomoFreeAccounts(param *FreeAccountsQueryParam) (*[]domain.MomoAccount, error) {
 	accounts := make([]domain.MomoAccount, 0, param.Limit)
 	db := dbPool.NewConn().Begin()
 	if param.Account != "" {
 		db = db.Where("account = ?", param.Account)
 	}
-	db = db.Where("status = ?", domain.MomoAccountStatusFree)
+	db = db.Where("status = ?", domain.AccountStatusFree)
 	dbResult := db.Where("province = ? and city = ?", param.Province, param.City).Limit(param.Limit).Find(&accounts)
 	if dbResult.Error != nil {
 		db.Rollback()
@@ -196,7 +183,7 @@ func GetFreeAccounts(param *FreeAccountsQueryParam) (*[]domain.MomoAccount, erro
 	if len(accounts) < param.Limit {
 		limit := param.Limit - len(accounts)
 		fillAccounts := make([]domain.MomoAccount, limit)
-		dbResult = db.Where("status = ?", domain.MomoAccountStatusFree).Limit(limit).Find(&fillAccounts)
+		dbResult = db.Where("status = ?", domain.AccountStatusFree).Limit(limit).Find(&fillAccounts)
 		if dbResult.Error != nil {
 			db.Rollback()
 			return nil, dbResult.Error
@@ -208,8 +195,8 @@ func GetFreeAccounts(param *FreeAccountsQueryParam) (*[]domain.MomoAccount, erro
 
 	for i := range accounts {
 		account := accounts[i]
-		account.Status = domain.MomoAccountStatusLocked
-		if err := db.Model(&account).Update("status", domain.MomoAccountStatusLocked).Error; err != nil {
+		account.Status = domain.AccountStatusLocked
+		if err := db.Model(&account).Update("status", domain.AccountStatusLocked).Error; err != nil {
 			db.Rollback()
 			return nil, err
 		}
@@ -222,7 +209,7 @@ func GetFreeAccounts(param *FreeAccountsQueryParam) (*[]domain.MomoAccount, erro
 	return &accounts, nil
 }
 
-func GetAccountReply(account string) (*domain.Reply, error) {
+func GetMomoAccountReply(account string) (*domain.Reply, error) {
 	var momoAccount domain.MomoAccount
 	var reply domain.Reply
 	db := dbPool.NewConn().Begin()
@@ -241,7 +228,7 @@ func GetAccountReply(account string) (*domain.Reply, error) {
 		db.Rollback()
 		return nil, err
 	}
-	accountReply := domain.AccountReply{
+	accountReply := domain.MomoReply{
 		Account:     momoAccount.Account,
 		AccountType: momoAccount.AccountType,
 		ReplyID:     reply.ReplyID,
