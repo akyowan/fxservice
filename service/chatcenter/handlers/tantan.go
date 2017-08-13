@@ -97,7 +97,7 @@ func CompleteTantanAccount(req *httpserver.Request) *httpserver.Response {
 	}
 	id, err := strconv.ParseInt(v, 10, 64)
 	if err == nil {
-		loggers.Warn.Printf("CompleteTantanAccount ivalid id %s", e.Error())
+		loggers.Warn.Printf("CompleteTantanAccount ivalid id %s", err.Error())
 		return httpserver.NewResponseWithError(errors.ParameterError)
 	}
 
