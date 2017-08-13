@@ -29,6 +29,7 @@ func Start(addr string) {
 	r.RouteHandleFunc("/photos", handlers.AddPhotos).Methods("POST")
 	r.RouteHandleFunc("/devices", handlers.AddDevices).Methods("POST")
 
+	r.RouteHandleFunc("/tantan/accounts/{id}", handlers.CompleteTantanAccount).Methods("PATCH")
 	r.RouteHandleFunc("/tantan/accounts/new", handlers.UnRegisterTantanAccounts).Methods("GET")
 
 	loggers.Info.Printf("Starting User Center External Service [\033[0;32;1mOK\t%+v\033[0m] \n", addr)
