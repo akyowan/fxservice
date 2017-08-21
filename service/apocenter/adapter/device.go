@@ -6,6 +6,6 @@ import (
 
 // GetDeviceBySN
 // Get device by sn
-func GetDeviceBySN(sn string) (error, *domain.Device) {
+func GetDeviceBySN(sn string) (*domain.Device, error) {
 	return nil, nil
 }

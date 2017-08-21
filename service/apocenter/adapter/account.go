@@ -17,7 +17,7 @@ type AccountQueryParam struct {
 // GetAndLockFreeAccount
 // Get an free account from account cache
 // lock it
-func GetAndLockFreeAccount(queryParam *AccountQueryParam) (error, *domain.Account) {
+func GetAndLockFreeAccount(queryParam *AccountQueryParam) (*domain.Account, error) {
 	return nil, nil
 }
 
