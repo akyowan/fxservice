@@ -59,7 +59,7 @@ type Device struct {
 	Signin_count    int    `json:"signin_count,omitempty"`
 	Status          int    `json:"status,omitempty"`
 	Type            int    `json:"type,omitempty"`
-	Group           int    `json:"group,omitempty"`
+	Group           string `json:"group,omitempty"`
 }
 
 func (*Device) TableName() string {

@@ -45,3 +45,22 @@ func AddAccount(r *httpserver.Request) *httpserver.Response {
 
 	return resp
 }
+
+func AddDevice(r *httpserver.Request) *httpserver.Response {
+	var devices []domain.Device
+	if err := r.Parse(&devices); err != nil {
+		loggers.Warn.Printf("AddDevice invalid param input")
+		return httpserver.NewResponseWithError(errors.NewBadRequest("invalid input"))
+	}
+
+	result, err := adapter.AddDevices(devices)
+	if err != nil {
+		loggers.Error.Printf("AddDevic error %s", err.Error())
+		return httpserver.NewResponseWithError(errors.InternalServerError)
+	}
+
+	resp := httpserver.NewResponse()
+	resp.Data = *result
+
+	return resp
+}
