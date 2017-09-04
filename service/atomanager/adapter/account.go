@@ -15,6 +15,7 @@ func AddAccount(brief string, weight int, accounts []domain.Account) (*AddAccoun
 	db := dbPool.NewConn().Begin()
 	result := AddAccountResult{
 		Success:   0,
+		Exists:    []string{},
 		NoDevices: []string{},
 		Errors:    []domain.Account{},
 	}
@@ -40,9 +41,12 @@ func AddAccount(brief string, weight int, accounts []domain.Account) (*AddAccoun
 		db.Rollback()
 		return nil, dbResult.Error
 	}
+	if len(adds) <= 0 {
+		return &result, nil
+	}
 
 	var devices []domain.Device
-	if err := db.Where("bind_count = 0 AND status = 1").Limit(len(adds)).Find(&devices).Updates(domain.Device{BindCount: 1}).Error; err != nil {
+	if err := db.Where("bind_count = 0").Limit(len(adds)).Find(&devices).Updates(domain.Device{BindCount: 1}).Error; err != nil {
 		db.Rollback()
 		return nil, err
 	}
@@ -52,6 +56,9 @@ func AddAccount(brief string, weight int, accounts []domain.Account) (*AddAccoun
 		result.NoDevices = append(result.NoDevices, noDevices[i].Account)
 	}
 	result.Success = len(devices)
+	if result.Success == 0 {
+		return &result, nil
+	}
 
 	startId, err := getStartId(brief)
 	if err != nil {
@@ -81,6 +88,10 @@ func AddAccount(brief string, weight int, accounts []domain.Account) (*AddAccoun
 	}
 
 	if err := updateBrief(brief, weight, result.Success); err != nil {
+		db.Rollback()
+		return nil, err
+	}
+	if err := deleteBriefCache(); err != nil {
 		db.Rollback()
 		return nil, err
 	}
@@ -136,4 +147,12 @@ func updateBrief(brief string, weight, total int) error {
 		}
 		return nil
 	}
+}
+
+func deleteBriefCache() error {
+	key := "ACCOUNT_ALL_BRIEFS"
+	if err := redisPool.Del(key).Err(); err != nil {
+		return err
+	}
+	return nil
 }

@@ -17,4 +17,5 @@ type RedisConf struct {
 type ServerConf struct {
 	ExternalListenAddress string
 	InternalListenAddress string
+	AppKey                string
 }

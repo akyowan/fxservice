@@ -1,9 +1,11 @@
 {
    "RedisConf" : {
       "Host" : "localhost",
-      "Port" : "6379"
+      "Port" : "6379",
+      "DB":9
    },
    "ServerConf" : {
+       "AppKey":"c16058f6823ba76a44cc2078dffe014f",
       "ExternalListenAddress" : ":19801",
       "InternalListenAddress" : ":19802"
    },
