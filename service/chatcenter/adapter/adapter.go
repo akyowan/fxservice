@@ -8,7 +8,7 @@ import (
 var dbPool *mysql.DBPool
 
 func init() {
-	dbPool = mysql.NewDBPool(mysql.DBPoolConfig{
+	dbPool = mysql.NewPool(mysql.DBPoolConfig{
 		Host:         config.Conf.DBConf.Host,
 		Port:         config.Conf.DBConf.Port,
 		User:         config.Conf.DBConf.User,
