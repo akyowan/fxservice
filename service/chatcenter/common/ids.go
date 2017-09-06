@@ -6,10 +6,10 @@ import (
 	"fxservice/service/chatcenter/config"
 )
 
-var client redis.Client
+var client *redis.RedisPool
 
 func init() {
-	client = redis.NewClient(&redis.RedisConfig{
+	client = redis.NewPool(&redis.RedisConfig{
 		Host: config.Conf.RedisConf.Host,
 		Port: config.Conf.RedisConf.Port,
 		DB:   config.Conf.RedisConf.DB,

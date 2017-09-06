@@ -10,8 +10,6 @@ type TantanAccount struct {
 	Account      string        `json:"account,omitempty" gorm:"default:NULL"`
 	AccountType  AccountType   `json:"account_type,omitempty" gorm:"default:NULL"`
 	Password     string        `json:"password,omitempty" gorm:"default:NULL"`
-	Avatar       string        `json:"avatar,omitempty"`
-	PhotosID     string        `json:"photos_id,omitempty"`
 	Gender       GenderType    `json:"gender,omitempty"`
 	NickName     string        `json:"nick_name,omitempty"`
 	SN           string        `json:"sn,omitempty"`

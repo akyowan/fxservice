@@ -38,12 +38,6 @@ func UnRegisterTantanAccounts(req *httpserver.Request) *httpserver.Response {
 		return httpserver.NewResponseWithError(errors.NewNotFound("NO DEVICE INFO"))
 	}
 
-	avatar, err := adapter.GetFreeAvatar()
-	if err != nil {
-		loggers.Warn.Printf("UnRegisterTantanAccounts get enable avatar error %s", err.Error())
-		return httpserver.NewResponseWithError(errors.NewNotFound("NO AVATAR INFO"))
-	}
-
 	nickName, err := adapter.GetRandNickName()
 	if err != nil {
 		loggers.Warn.Printf("UnRegisterTantanAccounts get enable nickname error %s", err.Error())
@@ -53,8 +47,6 @@ func UnRegisterTantanAccounts(req *httpserver.Request) *httpserver.Response {
 
 	tantaAccount := domain.TantanAccount{
 		SN:           device.SN,
-		Avatar:       avatar.URL,
-		PhotosID:     avatar.PhotosID,
 		RegisterHost: strings.Split(req.RemoteAddr, ":")[0],
 		Province:     gps.Province,
 		City:         gps.City,
