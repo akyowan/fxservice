@@ -8,6 +8,8 @@ import json
 import argparse
 import re
 
+MAX_COUNT = 100
+
 class Uploader:
     def __init__(self, domain, appKey):
         self.device_api = "http://%s.71741.com/upload/devices" % domain
@@ -29,6 +31,7 @@ class Uploader:
 def UploadAccount(uploader, brief, path):
     fp = open(path, "r")
     accounts = []
+    total = 0
     for line in fp:
         line = line.replace('\r','').replace('\n','')
         info = line.split(" ")
@@ -38,14 +41,15 @@ def UploadAccount(uploader, brief, path):
                 "account":info[0],
                 "passwd":info[(len(info)-1)]
                 })
-        if len(accounts) >= 1000:
+        if len(accounts) >= MAX_COUNT:
             res = uploader.uploadAccount(brief, accounts)
             if res.status_code != 200:
                 print res.text
                 return False
             else:
                 r = res.json()
-                print "upload account success:%d errors:%d exist:%d" % (r["data"]["success"], len(r["data"]["errors"]), len(r["data"]["exists"]))
+                total += MAX_COUNT
+                print "upload account total:%d success:%d errors:%d exist:%d" % (total, r["data"]["success"], len(r["data"]["errors"]), len(r["data"]["exists"]))
             accounts = []
     if len(accounts) > 0:
         res = uploader.uploadAccount(brief, accounts)
@@ -54,12 +58,14 @@ def UploadAccount(uploader, brief, path):
             return False
         else:
             r = res.json()
-            print "upload account success:%d errors:%d exist:%d" % (r["data"]["success"], len(r["data"]["errors"]), len(r["data"]["exists"]))
+            total += len(accounts)
+            print "upload account total:%d success:%d errors:%d exist:%d" % (total, r["data"]["success"], len(r["data"]["errors"]), len(r["data"]["exists"]))
 
 def UploadDevice(uploader, group, path):
     fp = open(path, "r")
     reader = csv.DictReader(fp)
     devices = []
+    total = 0
     for row in reader:
         device = {
                 "sn"    :row["sn"],
@@ -91,15 +97,18 @@ def UploadDevice(uploader, group, path):
             device["mlb_seq"] = row["mlb_seq"]
         if row.has_key("baseband_version"):
             device["baseband_version"] = row["baseband_version"]
+        if row.has_key("version"):
+            device["version"] = row["version"]
         devices.append(device)
-        if len(devices) >= 1000:
+        if len(devices) >= MAX_COUNT:
             res = uploader.uploadDevice(devices)
             if res.status_code != 200:
                 print res.text
                 return False
             else:
                 r = res.json()
-                print "upload device success:%d errors:%d exists:%d" % (r["data"]["success"], len(r["data"]["errors"]), len(r["data"]["exists"]))
+                total += MAX_COUNT
+                print "upload device total:%d success:%d errors:%d exists:%d" % (total, r["data"]["success"], len(r["data"]["errors"]), len(r["data"]["exists"]))
             devices = []
 
     if len(devices) > 0:
@@ -109,7 +118,8 @@ def UploadDevice(uploader, group, path):
             return False
         else:
             r = res.json()
-            print "upload device success:%d errors:%d exists:%d" % (r["data"]["success"], len(r["data"]["errors"]), len(r["data"]["exists"]))
+            total += len(devices)
+            print "upload device total:%d success:%d errors:%d exists:%d" % (total, r["data"]["success"], len(r["data"]["errors"]), len(r["data"]["exists"]))
 
 def getGroup(path):
     path = "/%s" % path

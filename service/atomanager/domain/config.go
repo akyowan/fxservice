@@ -10,7 +10,7 @@ type DatabaseConf struct {
 
 type RedisConf struct {
 	Host string
-	Port string
+	Port int
 	DB   int
 }
 

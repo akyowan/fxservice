@@ -1,7 +1,7 @@
 {
    "RedisConf" : {
       "Host" : "localhost",
-      "Port" : "6379",
+      "Port" : 6379,
       "DB":9
    },
    "ServerConf" : {
