@@ -38,10 +38,10 @@ func AddAccount(brief string, weight int, accounts []domain.Account) (*AddAccoun
 			adds = append(adds, accounts[i])
 			continue
 		}
-		db.Rollback()
 		return nil, dbResult.Error
 	}
 	if len(adds) <= 0 {
+		db.Rollback()
 		return &result, nil
 	}
 
@@ -57,11 +57,13 @@ func AddAccount(brief string, weight int, accounts []domain.Account) (*AddAccoun
 	}
 	result.Success = len(devices)
 	if result.Success == 0 {
+		db.Rollback()
 		return &result, nil
 	}
 
 	startId, err := getStartId(brief)
 	if err != nil {
+		db.Rollback()
 		return nil, err
 	}
 
