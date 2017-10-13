@@ -41,6 +41,7 @@ func AddAccount(brief string, weight int, accounts []domain.Account) (*AddAccoun
 		return nil, dbResult.Error
 	}
 	if len(adds) <= 0 {
+		db.Rollback()
 		return &result, nil
 	}
 
