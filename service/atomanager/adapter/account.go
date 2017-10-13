@@ -164,5 +164,9 @@ func deleteBriefCache() error {
 	if err := redisPool.Del(key).Err(); err != nil {
 		return err
 	}
+	key = "ACCOUNT_MAX_RANGE"
+	if err := redisPool.Del(key).Err(); err != nil {
+		return err
+	}
 	return nil
 }
