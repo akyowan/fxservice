@@ -12,7 +12,7 @@ type AddAccountResult struct {
 }
 
 func AddAccount(brief string, weight int, accounts []domain.Account) (*AddAccountResult, error) {
-	db := dbPool.NewConn().Begin()
+	db := dbPool.NewConn()
 	result := AddAccountResult{
 		Success:   0,
 		Exists:    []string{},
@@ -38,17 +38,24 @@ func AddAccount(brief string, weight int, accounts []domain.Account) (*AddAccoun
 			adds = append(adds, accounts[i])
 			continue
 		}
-		db.Rollback()
 		return nil, dbResult.Error
 	}
 	if len(adds) <= 0 {
 		return &result, nil
 	}
 
+	trans := db.Begin()
 	var devices []domain.Device
-	if err := db.Where("bind_count = 0").Limit(len(adds)).Find(&devices).Updates(domain.Device{BindCount: 1}).Error; err != nil {
-		db.Rollback()
+	if err := trans.Where("bind_count = 0").Limit(len(adds)).Find(&devices).Error; err != nil {
+		trans.Rollback()
 		return nil, err
+	}
+	for i := range devices {
+		device := devices[i]
+		if err := trans.Table(device.TableName()).Where("id = ?", device.Id).Updates(domain.Device{BindCount: 1}).Error; err != nil {
+			trans.Rollback()
+			return nil, err
+		}
 	}
 
 	noDevices := adds[len(devices):]
@@ -57,11 +64,13 @@ func AddAccount(brief string, weight int, accounts []domain.Account) (*AddAccoun
 	}
 	result.Success = len(devices)
 	if result.Success == 0 {
+		trans.Rollback()
 		return &result, nil
 	}
 
 	startId, err := getStartId(brief)
 	if err != nil {
+		trans.Rollback()
 		return nil, err
 	}
 
@@ -80,23 +89,23 @@ func AddAccount(brief string, weight int, accounts []domain.Account) (*AddAccoun
 		account.Version = device.Version
 		account.Brief = brief
 		account.Status = 1
-		if err := db.Create(&account).Error; err != nil {
-			db.Rollback()
+		if err := trans.Create(&account).Error; err != nil {
+			trans.Rollback()
 			return nil, err
 		}
 		startId += 1
 	}
 
 	if err := updateBrief(brief, weight, result.Success); err != nil {
-		db.Rollback()
+		trans.Rollback()
 		return nil, err
 	}
 	if err := deleteBriefCache(); err != nil {
-		db.Rollback()
+		trans.Rollback()
 		return nil, err
 	}
 
-	db.Commit()
+	trans.Commit()
 	return &result, nil
 }
 
