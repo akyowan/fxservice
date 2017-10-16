@@ -60,15 +60,15 @@ func AddAccount(brief string, weight int, accounts []domain.Account) (*AddAccoun
 			return nil, err
 		}
 		dbResult := trans.Table(account.TableName()).Where("sn = ?", device.Sn).First(&account)
+		if dbResult.RecordNotFound() {
+			enableDevices = append(enableDevices, device)
+			continue
+		}
 		if dbResult.Error != nil {
 			trans.Rollback()
 			return nil, dbResult.Error
 		}
-		if !dbResult.RecordNotFound() {
-			loggers.Warn.Printf("AddAccount sn used [%v]", account)
-			continue
-		}
-		enableDevices = append(enableDevices, device)
+		loggers.Warn.Printf("AddAccount sn used [%v]", account)
 	}
 	trans.Commit()
 
