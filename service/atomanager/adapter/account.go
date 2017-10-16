@@ -1,6 +1,7 @@
 package adapter
 
 import (
+	"fxlibraries/loggers"
 	"fxservice/service/atomanager/domain"
 )
 
@@ -51,19 +52,31 @@ func AddAccount(brief string, weight int, accounts []domain.Account) (*AddAccoun
 		trans.Rollback()
 		return nil, err
 	}
+	var enableDevices []domain.Device
 	for i := range devices {
 		device := devices[i]
 		if err := trans.Table(device.TableName()).Where("id = ?", device.Id).Updates(domain.Device{BindCount: 1}).Error; err != nil {
 			trans.Rollback()
 			return nil, err
 		}
+		dbResult := trans.Table(account.TableName()).Where("sn = ?", device.Sn).First(&account)
+		if dbResult.Error != nil {
+			trans.Rollback()
+			return nil, dbResult.Error
+		}
+		if !dbResult.RecordNotFound() {
+			loggers.Warn.Printf("AddAccount sn used [%v]", account)
+			continue
+		}
+		enableDevices = append(enableDevices, device)
 	}
+	trans.Commit()
 
-	noDevices := adds[len(devices):]
+	noDevices := adds[len(enableDevices):]
 	for i := range noDevices {
 		result.NoDevices = append(result.NoDevices, noDevices[i].Account)
 	}
-	result.Success = len(devices)
+	result.Success = len(enableDevices)
 	if result.Success == 0 {
 		trans.Rollback()
 		return &result, nil
@@ -75,9 +88,9 @@ func AddAccount(brief string, weight int, accounts []domain.Account) (*AddAccoun
 		return nil, err
 	}
 
-	for i := range devices {
+	for i := range enableDevices {
 		account = adds[i]
-		device := devices[i]
+		device := enableDevices[i]
 		account.Id = startId
 		account.Sn = device.Sn
 		account.Imei = device.Imei

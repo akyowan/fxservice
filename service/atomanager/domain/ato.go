@@ -28,8 +28,8 @@ type Account struct {
 	Answer1     string     `json:"answwer1,omitempty"`
 	Answer2     string     `json:"answwer1,omitempty"`
 	Answer3     string     `json:"answwer1,omitempty"`
-	CreateAt    *time.Time `json:"create_time,omitempty" gorm:"column:create_time"`
-	UpdateAt    *time.Time `json:"update_time,omitempty" gorm:"column:update_time"`
+	CreatedAt   *time.Time `json:"create_time,omitempty" gorm:"column:create_time"`
+	UpdatedAt   *time.Time `json:"update_time,omitempty" gorm:"column:update_time"`
 }
 
 func (*Account) TableName() string {

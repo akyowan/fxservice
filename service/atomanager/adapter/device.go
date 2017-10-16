@@ -20,6 +20,7 @@ func AddDevices(devices []domain.Device) (*AddDevicesResult, error) {
 	}
 
 	var device domain.Device
+	isExists := false
 	for i := range devices {
 		d := devices[i]
 		if d.Sn == "" {
@@ -31,8 +32,50 @@ func AddDevices(devices []domain.Device) (*AddDevicesResult, error) {
 			return nil, dbResult.Error
 		}
 		if dbResult.Error == nil {
+			isExists = true
+			if d.Seq == "" {
+				d.Seq = device.Seq
+			}
+			if d.BuildNum == "" {
+				d.BuildNum = device.BuildNum
+			}
+			if d.HardWare == "" {
+				d.HardWare = device.HardWare
+			}
+			if d.Imei == "" {
+				d.Imei = device.Imei
+			}
+			if d.Ecid == "" {
+				d.Ecid = device.Ecid
+			}
+			if d.BasebandChipid == "" {
+				d.BasebandChipid = device.BasebandChipid
+			}
+			if d.BasebandVersion == "" {
+				d.BasebandVersion = device.BasebandVersion
+			}
+			if d.Firmware == "" {
+				d.Firmware = device.Firmware
+			}
+			if d.Model == "" {
+				d.Model = device.Model
+			}
+			if d.ModelNum == "" {
+				d.ModelNum = device.ModelNum
+			}
+			if d.HardwareModel == "" {
+				d.HardwareModel = device.HardwareModel
+			}
+			if d.MlbSeq == "" {
+				d.MlbSeq = device.MlbSeq
+			}
+			if d.Region == "" {
+				d.Region = device.Region
+			}
+			if d.Wifi == "" {
+				d.Wifi = device.Wifi
+			}
 			result.Exists = append(result.Exists, d.Sn)
-			continue
 		}
 
 		if d.Imei == "" {
@@ -66,15 +109,26 @@ func AddDevices(devices []domain.Device) (*AddDevicesResult, error) {
 		if d.Model == "" {
 			d.Model = common.RandModel()
 		}
-		d.HardWare = common.HardWare(d.Model)
-		d.BuildNum = common.BuildNum(d.Version)
+		if d.BuildNum == "" {
+			d.BuildNum = common.BuildNum(d.Version)
+		}
+		if d.HardWare == "" {
+			d.HardWare = common.HardWare(d.Model)
+		}
 		if d.Imei != "" && len(d.Seq) > 3 {
 			d.Type = 1
 		}
 
-		if err := db.Create(&d).Error; err != nil {
-			db.Rollback()
-			return nil, err
+		if isExists {
+			if err := db.Table(d.TableName()).Where("sn = ?", d.Sn).Updates(d).Error; err != nil {
+				db.Rollback()
+				return nil, err
+			}
+		} else {
+			if err := db.Create(&d).Error; err != nil {
+				db.Rollback()
+				return nil, err
+			}
 		}
 		result.Success += 1
 	}
