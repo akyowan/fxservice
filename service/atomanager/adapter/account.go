@@ -70,7 +70,6 @@ func AddAccount(brief string, weight int, accounts []domain.Account) (*AddAccoun
 		}
 		loggers.Warn.Printf("AddAccount sn used [%v]", account)
 	}
-	trans.Commit()
 
 	noDevices := adds[len(enableDevices):]
 	for i := range noDevices {
