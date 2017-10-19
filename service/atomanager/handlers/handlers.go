@@ -16,6 +16,7 @@ func AddAccount(r *httpserver.Request) *httpserver.Response {
 		loggers.Warn.Printf("AddAccount no brief")
 		return httpserver.NewResponseWithError(errors.NewBadRequest("no brief"))
 	}
+	dGroup := r.QueryParams.Get("device_group")
 	weight := 0
 	if weightStr == "" {
 		weight = 0
@@ -34,7 +35,7 @@ func AddAccount(r *httpserver.Request) *httpserver.Response {
 		return httpserver.NewResponseWithError(errors.NewBadRequest("invalid input"))
 	}
 
-	result, err := adapter.AddAccount(brief, weight, accounts)
+	result, err := adapter.AddAccount(brief, dGroup, weight, accounts)
 	if err != nil {
 		loggers.Error.Printf("AddAccount error %s", err.Error())
 		return httpserver.NewResponseWithError(errors.InternalServerError)
@@ -53,7 +54,9 @@ func AddDevice(r *httpserver.Request) *httpserver.Response {
 		return httpserver.NewResponseWithError(errors.NewBadRequest("invalid input"))
 	}
 
-	result, err := adapter.AddDevices(devices)
+	group := r.QueryParams.Get("group")
+
+	result, err := adapter.AddDevices(group, devices)
 	if err != nil {
 		loggers.Error.Printf("AddDevic error %s", err.Error())
 		return httpserver.NewResponseWithError(errors.InternalServerError)

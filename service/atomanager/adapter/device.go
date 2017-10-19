@@ -11,7 +11,7 @@ type AddDevicesResult struct {
 	Success int             `json:"success"`
 }
 
-func AddDevices(devices []domain.Device) (*AddDevicesResult, error) {
+func AddDevices(group string, devices []domain.Device) (*AddDevicesResult, error) {
 	db := dbPool.NewConn().Begin()
 	result := AddDevicesResult{
 		Success: 0,
@@ -117,6 +117,9 @@ func AddDevices(devices []domain.Device) (*AddDevicesResult, error) {
 		}
 		if d.Imei != "" && len(d.Seq) > 3 {
 			d.Type = 1
+		}
+		if group != "" {
+			d.Group = group
 		}
 
 		if isExists {
