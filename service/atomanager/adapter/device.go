@@ -3,6 +3,7 @@ package adapter
 import (
 	"fxservice/service/atomanager/common"
 	"fxservice/service/atomanager/domain"
+	version "github.com/hashicorp/go-version"
 )
 
 type AddDevicesResult struct {
@@ -75,9 +76,9 @@ func AddDevices(group string, devices []domain.Device) (*AddDevicesResult, error
 			if d.Wifi == "" {
 				d.Wifi = device.Wifi
 			}
-            if d.Version == "" {
-                d.Version = device.Version
-            }
+			if d.Version == "" {
+				d.Version = device.Version
+			}
 			result.Exists = append(result.Exists, d.Sn)
 		}
 
@@ -93,9 +94,16 @@ func AddDevices(group string, devices []domain.Device) (*AddDevicesResult, error
 				mKey = d.Seq[len(d.Seq)-4:]
 			}
 		}
-		if d.Version == "" || d.Version < "9.0" {
+
+		minVersion, _ := version.NewVersion("9.0")
+		curVersion, err := version.NewVersion(d.Version)
+		if err != nil {
+			curVersion = minVersion
+		}
+		if !curVersion.GreaterThan(minVersion) {
 			d.Version = common.RandVersion()
 		}
+
 		if d.Mac == "" {
 			d.Mac = " "
 		}
