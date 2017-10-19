@@ -48,11 +48,12 @@ func AddAccount(brief string, dGroup string, weight int, accounts []domain.Accou
 
 	trans := db.Begin()
 	var devices []domain.Device
+    cur := trans
 	if dGroup != "" {
-		trans = trans.Where("`group` = ?", dGroup)
+		cur = cur.Where(&domain.Device{Group:dGroup})
 	}
-	if err := trans.Where("bind_count = 0").Limit(len(adds)).Find(&devices).Error; err != nil {
-		trans.Rollback()
+	if err := cur.Where("bind_count = 0").Limit(len(adds)).Find(&devices).Error; err != nil {
+		cur.Rollback()
 		return nil, err
 	}
 	var enableDevices []domain.Device

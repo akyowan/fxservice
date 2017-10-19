@@ -75,6 +75,9 @@ func AddDevices(group string, devices []domain.Device) (*AddDevicesResult, error
 			if d.Wifi == "" {
 				d.Wifi = device.Wifi
 			}
+            if d.Version == "" {
+                d.Version = device.Version
+            }
 			result.Exists = append(result.Exists, d.Sn)
 		}
 
