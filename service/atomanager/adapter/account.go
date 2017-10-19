@@ -49,7 +49,7 @@ func AddAccount(brief string, dGroup string, weight int, accounts []domain.Accou
 	trans := db.Begin()
 	var devices []domain.Device
 	if dGroup != "" {
-		trans = trans.Where("group = ?", dGroup)
+		trans = trans.Where("`group` = ?", dGroup)
 	}
 	if err := trans.Where("bind_count = 0").Limit(len(adds)).Find(&devices).Error; err != nil {
 		trans.Rollback()
