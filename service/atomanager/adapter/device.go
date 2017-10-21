@@ -20,9 +20,12 @@ func AddDevices(group string, devices []domain.Device) (*AddDevicesResult, error
 		Errors:  []domain.Device{},
 	}
 
-	var device domain.Device
-	isExists := false
+	var (
+		device   domain.Device
+		isExists bool
+	)
 	for i := range devices {
+		isExists = false
 		d := devices[i]
 		if d.Sn == "" {
 			result.Errors = append(result.Errors, d)
@@ -146,6 +149,8 @@ func AddDevices(group string, devices []domain.Device) (*AddDevicesResult, error
 		}
 		result.Success += 1
 	}
-	db.Commit()
+	if err := db.Commit().Error; err != nil {
+		return nil, err
+	}
 	return &result, nil
 }
