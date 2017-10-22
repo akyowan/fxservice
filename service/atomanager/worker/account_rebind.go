@@ -6,17 +6,15 @@ import (
 	"time"
 )
 
-var INTERVAL_TIME time.Duration
-
-func init() {
-	INTERVAL_TIME = time.Minute * 1
+type AccountRebinder struct {
+	Interval time.Duration
 }
 
-func Run() {
+func (worker *AccountRebinder) Run() {
 	for {
 		if err := adapter.RebindAccount(); err != nil {
 			loggers.Error.Printf("RebindAccount error %s", err.Error())
 		}
-		time.Sleep(INTERVAL_TIME)
+		time.Sleep(worker.Interval)
 	}
 }

@@ -1,0 +1,25 @@
+{
+    "Redis": {
+        "Host": "localhost",
+        "Port": 6379,
+        "DBName":"1"
+
+    },
+    "Server": {
+        "ExternalListenAddress": ":19801",
+        "InternalListenAddress": ":19802"
+    },
+    "Mysql": {
+        "DBName": "koudai_apo",
+        "Host": "192.168.1.103",
+        "Port": 3306,
+        "Password": "koudai123456",
+        "User": "wans"
+    },
+    "MongoDB": {
+        "DBName": "storage_apo",
+        "Port": 27017,
+        "Host": "localhost"
+    },
+    "CommentDayMaxCount": 1
+}

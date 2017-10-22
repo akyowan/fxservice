@@ -155,3 +155,11 @@ func AddDevices(group string, devices []domain.Device) (*AddDevicesResult, error
 	}
 	return &result, nil
 }
+
+func StoreDevice() error {
+	//key := "report_list"
+	//for {
+	//	result := redisPool.RPop(key)
+	//}
+	return nil
+}

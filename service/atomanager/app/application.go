@@ -7,6 +7,7 @@ import (
 	"fxservice/service/atomanager/config"
 	"fxservice/service/atomanager/handlers"
 	"fxservice/service/atomanager/worker"
+	"time"
 )
 
 func init() {
@@ -28,8 +29,8 @@ func Start(addr string) {
 	r.RouteHandleFunc("/accounts/{brief}", Auth(handlers.AddAccount)).Methods("POST")
 	r.RouteHandleFunc("/devices", Auth(handlers.AddDevice)).Methods("POST")
 
-	go worker.Run()
-
+	accountRebinder := worker.AccountRebinder{Interval: time.Minute * 1}
+	go accountRebinder.Run()
 	loggers.Info.Printf("Starting ATO  Center External Service [\033[0;32;1mOK\t%+v\033[0m] \n", addr)
 	panic(r.ListenAndServe(addr))
 }
