@@ -6,6 +6,7 @@ import (
 	"fxlibraries/loggers"
 	"fxservice/service/atomanager/config"
 	"fxservice/service/atomanager/handlers"
+	"fxservice/service/atomanager/worker"
 )
 
 func init() {
@@ -26,6 +27,9 @@ func Start(addr string) {
 	r := httpserver.NewRouter()
 	r.RouteHandleFunc("/accounts/{brief}", Auth(handlers.AddAccount)).Methods("POST")
 	r.RouteHandleFunc("/devices", Auth(handlers.AddDevice)).Methods("POST")
+
+	go worker.Run()
+
 	loggers.Info.Printf("Starting ATO  Center External Service [\033[0;32;1mOK\t%+v\033[0m] \n", addr)
 	panic(r.ListenAndServe(addr))
 }

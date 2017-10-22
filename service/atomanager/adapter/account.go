@@ -48,11 +48,11 @@ func AddAccount(brief string, dGroup string, weight int, accounts []domain.Accou
 
 	trans := db.Begin()
 	var devices []domain.Device
-    cur := trans
+	cur := trans
 	if dGroup != "" {
-		cur = cur.Where(&domain.Device{Group:dGroup})
+		cur = cur.Where(&domain.Device{Group: dGroup})
 	}
-	if err := cur.Where("bind_count = 0").Limit(len(adds)).Find(&devices).Error; err != nil {
+	if err := cur.Where("bind_count = 0").Where("status = 1").Limit(len(adds)).Find(&devices).Error; err != nil {
 		cur.Rollback()
 		return nil, err
 	}
@@ -124,6 +124,62 @@ func AddAccount(brief string, dGroup string, weight int, accounts []domain.Accou
 
 	trans.Commit()
 	return &result, nil
+}
+
+func RebindAccount() error {
+	db := dbPool.NewConn().Begin()
+	var (
+		accounts []domain.Account
+		devices  []domain.Device
+	)
+	limit := 100
+	for {
+		if err := db.Where("errno = ?", 22).Limit(limit).Find(&accounts).Error; err != nil {
+			loggers.Info.Printf("RebindAccount no account need rebind")
+			db.Rollback()
+			return err
+		}
+		if len(accounts) == 0 {
+			loggers.Info.Printf("RebindAccount no account need rebind")
+			db.Rollback()
+			return nil
+		}
+
+		if err := db.Where("bind_count = 0").Where("status = 1").Limit(len(accounts)).Find(&devices).Error; err != nil {
+			db.Rollback()
+			return err
+		}
+
+		if len(devices) < len(accounts) {
+			loggers.Warn.Printf("RebindAccount no enought device for rebind account need:%d get:%d", len(accounts), len(devices))
+		}
+
+		for i, device := range devices {
+			account := accounts[i]
+			account.Sn = device.Sn
+			account.Errno = 0
+			account.Status = 1
+			device.BindCount = 1
+			if err := db.Model(account).Save(account).Error; err != nil {
+				db.Rollback()
+				return err
+			}
+			if err := db.Model(device).Update(device).Error; err != nil {
+				db.Rollback()
+				return err
+			}
+			loggers.Info.Printf("RebindAccount account:%s sn:%s", account.Account, device.Sn)
+		}
+		if len(accounts) < limit {
+			break
+		}
+	}
+	if err := db.Commit().Error; err != nil {
+		db.Rollback()
+		return err
+	}
+
+	return nil
 }
 
 func getStartId(brief string) (int, error) {
