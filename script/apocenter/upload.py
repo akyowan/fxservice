@@ -8,7 +8,7 @@ import json
 import argparse
 import re
 
-MAX_COUNT = 100
+MAX_COUNT = 1000
 
 class Uploader:
     def __init__(self, domain, appKey):
