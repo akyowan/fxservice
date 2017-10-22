@@ -142,6 +142,7 @@ func AddDevices(group string, devices []domain.Device) (*AddDevicesResult, error
 				return nil, err
 			}
 		} else {
+			d.Status = 1
 			if err := db.Create(&d).Error; err != nil {
 				db.Rollback()
 				return nil, err
