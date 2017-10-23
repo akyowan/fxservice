@@ -3,6 +3,7 @@ package adapter
 import (
 	"fxservice/service/atomanager/common"
 	"fxservice/service/atomanager/domain"
+
 	version "github.com/hashicorp/go-version"
 )
 
@@ -159,7 +160,15 @@ func AddDevices(group string, devices []domain.Device) (*AddDevicesResult, error
 func StoreDevice() error {
 	//key := "report_list"
 	//for {
-	//	result := redisPool.RPop(key)
+	//	//	var record map[string]interface{}
+	//	//	result := redisPool.RPop(key)
+	//	//	if err := json.Unmarshal(result.Bytes(), &record); err != nil {
+	//	//		loggers.Info.Printf("StoreDevice json unmarshal error:%s", err.Error())
+	//	//		loggers.Info.Println(result.String())
+	//	//		continue
+	//	//	}
+	//	//	var device domain.Device
+	//	//	if sn, ok := record["sn
 	//}
 	return nil
 }
