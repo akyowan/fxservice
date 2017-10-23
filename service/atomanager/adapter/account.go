@@ -160,6 +160,7 @@ func RebindAccount() error {
 			account.Errno = 0
 			account.Status = 1
 			device.BindCount = 1
+			device.Status = 0
 			if err := db.Model(account).Save(account).Error; err != nil {
 				db.Rollback()
 				return err
