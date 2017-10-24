@@ -31,6 +31,12 @@ func Start(addr string) {
 
 	accountRebinder := worker.AccountRebinder{Interval: time.Minute * 1}
 	go accountRebinder.Run()
+
+	if config.Conf.ServerConf.Domain == "kdzs" {
+		deviceStorager := worker.DeviceStorager{Interval: time.Minute * 1}
+		go deviceStorager.Run()
+	}
+
 	loggers.Info.Printf("Starting ATO  Center External Service [\033[0;32;1mOK\t%+v\033[0m] \n", addr)
 	panic(r.ListenAndServe(addr))
 }
