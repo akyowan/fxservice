@@ -24,7 +24,7 @@ func init() {
 	WXAppID = "wx76f4d728509ad3e1"
 	WXMchID = "1480686862"
 	WXKey = "YHPtbJvVxdPXHbkahZRbaqNK3EoTtkiP"
-	WXCallBackUrl = "http://api.vcrxyz.com/wxpay/callback"
+	WXCallBackUrl = "https://api.vincross.com/wxpay/callback"
 	WXUniFiedOrderAPI = "https://api.mch.weixin.qq.com/pay/unifiedorder"
 }
 
