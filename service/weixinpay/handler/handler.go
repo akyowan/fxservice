@@ -29,7 +29,7 @@ func SubmitOrder(r *httpserver.Request) *httpserver.Response {
 		return httpserver.NewResponseWithError(errors.InternalServerError)
 	}
 	if payMethod != "NATIVE" {
-		referer := "http://api.vincorss.com/order/result/" + orderID
+		referer := "https://www.vincross.com"
 		return httpserver.NewResponseForRedirect(order.MWebURL, referer)
 	}
 
