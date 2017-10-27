@@ -12,6 +12,7 @@ func init() {
 
 func Start(addr string) {
 	r := httpserver.NewRouter()
+	r.RouteHandleFunc("/order/h5", handler.SubmitH5Order).Methods("GET")
 	r.RouteHandleFunc("/order/new", handler.SubmitOrder).Methods("GET")
 	r.RouteHandleFunc("/callback", handler.PayCallBack).Methods("POST")
 	r.RouteHandleFunc("/order/result/{orderID}", handler.PayResult).Methods("GET")

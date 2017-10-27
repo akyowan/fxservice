@@ -29,12 +29,17 @@ func SubmitOrder(r *httpserver.Request) *httpserver.Response {
 		return httpserver.NewResponseWithError(errors.InternalServerError)
 	}
 	if payMethod != "NATIVE" {
-		referer := "https://www.vincross.com"
-		return httpserver.NewResponseForRedirect(order.MWebURL, referer)
+		return httpserver.NewResponseForRedirect(order.MWebURL)
 	}
 
 	resp := httpserver.NewResponse()
 	resp.Data = order
+	return resp
+}
+
+func SubmitH5Order(r *httpserver.Request) *httpserver.Response {
+	resp := httpserver.NewResponse()
+	resp.Data = "https://api.vincross.com/wxpay/order/new?payMethod=MWEB"
 	return resp
 }
 
