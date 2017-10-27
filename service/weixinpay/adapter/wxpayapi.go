@@ -67,6 +67,7 @@ type UniFiedOrderResp struct {
 	TradeType  string `xml:"trade_type,omitempty"`
 	PrepayID   string `xml:"prepay_id,omitempty"`
 	CodeURL    string `xml:"code_url,omitempty"`
+	MWebURL    string `xml:"mweb_url,omitempty"`
 }
 
 type PayResult struct {

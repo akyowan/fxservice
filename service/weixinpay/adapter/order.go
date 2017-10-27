@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"fxlibraries/loggers"
 	uuid "github.com/satori/go.uuid"
 	"time"
-	"fxlibraries/loggers"
 )
 
 var Orders map[string]Order
@@ -21,12 +21,13 @@ type Order struct {
 	Detail     string      `json:"detail,omitempty"`
 	Attach     string      `json:"attach,omitempty"`
 	TotalPrice int         `json:"totalPrice,omitempty"`
-	CodeURL    string      `json:"CodeURL,omitempty"`
+	CodeURL    string      `json:"codeURL,omitempty"`
+	MWebURL    string      `json:"mwebURL,omitempty"`
 	GoodID     string      `json:"goodID,omitempty"`
-	PayMethod  string      `json:"pay_method,omitempty"`
+	PayMethod  string      `json:"payMethod,omitempty"`
 	Status     OrderStatus `json:"status"`
-	Created    *time.Time  `json:"create_time,omitempty"`
-	Updated    *time.Time  `json:"update_time,omitempty"`
+	Created    *time.Time  `json:"createTime,omitempty"`
+	Updated    *time.Time  `json:"updateTime,omitempty"`
 }
 
 type OrderStatus int
@@ -72,6 +73,7 @@ func SumitOrder(order *Order, clientIP string) (*Order, error) {
 	order.Status = OrderStatusPaying
 	order.CodeURL = uResp.CodeURL
 	order.Updated = &now
+	order.MWebURL = uResp.MWebURL
 
 	Orders[order.OrderID] = *order
 	return order, nil

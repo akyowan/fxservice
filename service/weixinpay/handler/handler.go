@@ -5,19 +5,24 @@ import (
 	"fxlibraries/httpserver"
 	"fxlibraries/loggers"
 	"fxservice/service/weixinpay/adapter"
+	"strings"
 	"time"
 )
 
 func SubmitOrder(r *httpserver.Request) *httpserver.Response {
+	payMethod := r.QueryParams.Get("payMethod")
+	if payMethod == "" {
+		payMethod = "NATIVE"
+	}
 	orderID := time.Now().Format("20060102150405")
 	order := &adapter.Order{
 		OrderID:    orderID,
 		TotalPrice: 1,
 		GoodID:     "HEXA",
 		Body:       "Vincross HEXA",
-		PayMethod:  "NATIVE",
+		PayMethod:  payMethod,
 	}
-	ip := "12.13.14.15"
+	ip := strings.Split(r.RemoteAddr, ":")[0]
 	order, err := adapter.SumitOrder(order, ip)
 	if err != nil {
 		loggers.Error.Printf("SubmitOrder error %s", err.Error())
