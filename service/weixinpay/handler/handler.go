@@ -30,7 +30,26 @@ func SubmitOrder(r *httpserver.Request) *httpserver.Response {
 }
 
 func PayCallBack(r *httpserver.Request) *httpserver.Response {
+	var payResult adapter.PayResult
 	resp := httpserver.NewResponse()
 	resp.IsWx = true
+	if err := r.ParseByXML(&payResult); err != nil {
+		loggers.Warn.Printf("Parse weixin pay callback error")
+		return resp
+	}
+	adapter.WXPayCallBack(payResult.OutTradeNO, adapter.OrderStatusPaid)
+	return resp
+}
+
+func PayResult(r *httpserver.Request) *httpserver.Response {
+	orderID := r.UrlParams["orderID"]
+
+	order, err := adapter.GetOrder(orderID)
+	if err != nil {
+		return httpserver.NewResponseWithError(errors.InternalServerError)
+	}
+
+	resp := httpserver.NewResponse()
+	resp.Data = order
 	return resp
 }

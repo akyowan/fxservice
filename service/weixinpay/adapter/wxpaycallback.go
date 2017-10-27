@@ -28,7 +28,3 @@ type WXPayResult struct {
 	Attach             string `xml:"attach"`
 	TimeEnd            string `xml:"time_end"`
 }
-
-func WXPayCallBack(r *WXPayResult) error {
-	return nil
-}

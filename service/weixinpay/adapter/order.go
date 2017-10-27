@@ -77,6 +77,26 @@ func SumitOrder(order *Order, clientIP string) (*Order, error) {
 	return order, nil
 }
 
+func WXPayCallBack(orderID string, status OrderStatus) (*Order, error) {
+	order, ok := Orders[orderID]
+	if !ok {
+		return nil, errors.New("NO THIS ORDER")
+	}
+	now := time.Now()
+	order.Status = OrderStatusPaid
+	order.Updated = &now
+	Orders[orderID] = order
+	return &order, nil
+}
+
+func GetOrder(orderID string) (*Order, error) {
+	order, ok := Orders[orderID]
+	if !ok {
+		return nil, errors.New("NO THIS ORDER")
+	}
+	return &order, nil
+}
+
 func RandHex(n int) string {
 	u1 := uuid.NewV4()
 	d, _ := u1.MarshalBinary()

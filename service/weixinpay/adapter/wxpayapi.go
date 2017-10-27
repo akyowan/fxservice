@@ -24,7 +24,7 @@ func init() {
 	WXAppID = "wx76f4d728509ad3e1"
 	WXMchID = "1480686862"
 	WXKey = "YHPtbJvVxdPXHbkahZRbaqNK3EoTtkiP"
-	WXCallBackUrl = "https://api.vincross.com/wxpay/callback"
+	WXCallBackUrl = "http://api.vcrxyz.com/wxpay/callback"
 	WXUniFiedOrderAPI = "https://api.mch.weixin.qq.com/pay/unifiedorder"
 }
 
@@ -67,6 +67,38 @@ type UniFiedOrderResp struct {
 	TradeType  string `xml:"trade_type,omitempty"`
 	PrepayID   string `xml:"prepay_id,omitempty"`
 	CodeURL    string `xml:"code_url,omitempty"`
+}
+
+type PayResult struct {
+	ReturnCode         string `xml:"return_code,omitempty"`
+	ReturnMsg          string `xml:"return_msg,omitempty"`
+	AppID              string `xml:"appid,omitempty"`
+	MchID              string `xml:"mch_id,omitempty"`
+	DeviceInfo         string `xml:"device_info,omitempty"`
+	NonceStr           string `xml:"nonce_str,omitempty"`
+	Sign               string `xml:"sign,omitempty"`
+	SignType           string `xml:"sign_type,omitempty"`
+	ResultCode         string `xml:"result_code,omitempty"`
+	ErrCode            string `xml:"err_code,omitempty"`
+	ErrCodeDes         string `xml:"err_code_des,omitempty"`
+	OpenID             string `xml:"open_id,omitempty"`
+	IsSubscribe        string `xml:"is_subscribe,omitempty"`
+	TradeType          string `xml:"trade_type,omitempty"`
+	BankType           string `xml"bank_type,omitempty"`
+	TotalFee           int    `xml:"total_fee,omitempty"`
+	SettlementTotalFee int    `xml:"settlement_total_fee,omitempty"`
+	FeeType            string `xml:"fee_type,omitempty"`
+	CashFee            int    `xml:"cash_fee,omitempty"`
+	CashFeeType        string `xml:"cash_fee_type,omitempty"`
+	CouponFee          int    `xml:"coupon_fee,omitempty"`
+	CouponCount        int    `xml:"coupon_count,omitempty"`
+	CouponType0        string `xml:"coupon_type_0,omitempty"`
+	CouponID0          string `xml:"coupon_type_0,omitempty"`
+	CouponFee0         int    `xml:"coupon_type_0,omitempty"`
+	TransactionID      string `xml:"transaction_id,omitempty"`
+	OutTradeNO         string `xml:"out_trade_no,omitempty"`
+	Attach             string `xml:"attach,omitempty"`
+	TimeEnd            string `xml:"time_end,omitempty"`
 }
 
 func WXSign(info *UniFiedOrderReq, key string) string {
