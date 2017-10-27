@@ -28,6 +28,9 @@ func SubmitOrder(r *httpserver.Request) *httpserver.Response {
 		loggers.Error.Printf("SubmitOrder error %s", err.Error())
 		return httpserver.NewResponseWithError(errors.InternalServerError)
 	}
+	if payMethod != "NATIVE" {
+		return httpserver.NewResponseForRedirect(order.MWebURL)
+	}
 
 	resp := httpserver.NewResponse()
 	resp.Data = order
