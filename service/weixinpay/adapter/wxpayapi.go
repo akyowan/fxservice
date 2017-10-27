@@ -93,8 +93,8 @@ type PayResult struct {
 	CouponFee          int    `xml:"coupon_fee,omitempty"`
 	CouponCount        int    `xml:"coupon_count,omitempty"`
 	CouponType0        string `xml:"coupon_type_0,omitempty"`
-	CouponID0          string `xml:"coupon_type_0,omitempty"`
-	CouponFee0         int    `xml:"coupon_type_0,omitempty"`
+	CouponID0          string `xml:"coupon_id_0,omitempty"`
+	CouponFee0         int    `xml:"coupon_fee_0,omitempty"`
 	TransactionID      string `xml:"transaction_id,omitempty"`
 	OutTradeNO         string `xml:"out_trade_no,omitempty"`
 	Attach             string `xml:"attach,omitempty"`
