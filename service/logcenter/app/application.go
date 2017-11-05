@@ -24,7 +24,10 @@ func Auth(f httpserver.HandleFunc) httpserver.HandleFunc {
 
 func Start(addr string) {
 	r := httpserver.NewRouter()
-	r.RouteHandleFunc("/pdf", handler.PDFLogReport).Methods("POST")
+	r.RouteHandleFunc("/report", handler.PDFLogReport).Methods("POST")
+	r.RouteHandleFunc("/feedback", handler.Feedback).Methods("POST")
+	r.RouteHandleFunc("/crash", handler.DumpUpload).Methods("POST")
+	r.RouteHandleFunc("/checkUpdate", handler.CheckUpdate).Methods("GET")
 
 	loggers.Info.Printf("Starting LogCenter External Service [\033[0;32;1mOK\t%+v\033[0m] \n", addr)
 	panic(r.ListenAndServe(addr))

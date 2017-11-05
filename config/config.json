@@ -1,9 +1,9 @@
 {
-    "RedisConf": {
+    "Redis": {
         "Host": "localhost",
         "Port": 6379
     },
-    "ServerConf": {
+    "Server": {
         "ExternalListenAddress": ":19801",
         "InternalListenAddress": ":19802"
     },
@@ -13,5 +13,17 @@
         "Port": 3306,
         "Password": "koudai123456",
         "User": "wans"
+    },
+    "MongoDB": {
+        "DBName": "pdf_storage",
+        "Port": 27017,
+        "Host": "localhost"
+    }, 
+    "Storage":{
+        "Bucket":"kdstore",
+        "EndPoint":"oss-cn-beijing.aliyuncs.com",
+        "AccessID":"7aEtz1fwZyMqzC6x",
+        "AccessKey":"39PNIMnJDaYH8KDR3r6nvfKGi5bY7v"
     }
+
 }

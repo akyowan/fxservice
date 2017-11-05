@@ -13,6 +13,7 @@ type Config struct {
 	Redis              domain.DBConf
 	MongoDB            domain.DBConf
 	Server             domain.ServerConf
+	Storage            domain.Storage
 	CommentDayMaxCount int64
 }
 
@@ -44,4 +45,5 @@ func init() {
 			panic(err)
 		}
 	}
+	fmt.Println(Conf.Server.InternalListenAddress)
 }
