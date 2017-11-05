@@ -12,12 +12,12 @@ import (
 
 func DumpUpload(r *httpserver.Request) *httpserver.Response {
 	var dump domain.Dump
-	dump.DeviceID = r.UrlParams["device_id"]
+	dump.DeviceID = r.QueryParams.Get("device_id")
 	if dump.DeviceID == "" {
 		dump.DeviceID = "UNKOWN"
 	}
-	dump.OS = r.UrlParams["os"]
-	dump.Version = r.UrlParams["version"]
+	dump.OS = r.QueryParams.Get("os")
+	dump.Version = r.QueryParams.Get("version")
 	dump.IP = strings.Split(r.RemoteAddr, ":")[0]
 	dump.ObjectID = fmt.Sprintf("dump/%s_%d", dump.DeviceID, time.Now().UnixNano())
 	if err := adapter.PutObject(dump.ObjectID, r.BodyBuff); err != nil {

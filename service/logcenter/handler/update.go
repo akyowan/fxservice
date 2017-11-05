@@ -8,9 +8,9 @@ import (
 )
 
 func CheckUpdate(r *httpserver.Request) *httpserver.Response {
-	deviceID := r.UrlParams["device_id"]
-	version := r.UrlParams["version"]
-	os := r.UrlParams["os"]
+	deviceID := r.QueryParams.Get("device_id")
+	version := r.QueryParams.Get("version")
+	os := r.QueryParams.Get("os")
 
 	loggers.Info.Printf("CheckUpdate deviceID:%s version:%s os:%s", deviceID, version, os)
 	latestVersion, err := adapter.GetLatestVersion()
