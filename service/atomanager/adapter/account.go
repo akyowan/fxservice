@@ -22,6 +22,7 @@ func AddAccount(brief string, dGroup string, weight int, accounts []domain.Accou
 	}
 	var adds []domain.Account
 	var account domain.Account
+	var exists []domain.Account
 	for i := range accounts {
 		if accounts[i].Account == "" {
 			continue
@@ -33,6 +34,7 @@ func AddAccount(brief string, dGroup string, weight int, accounts []domain.Accou
 		dbResult := db.Select("account").Where("account = ?", accounts[i].Account).First(&account)
 		if dbResult.Error == nil {
 			result.Exists = append(result.Exists, accounts[i].Account)
+			exists = append(exists, accounts[i])
 			continue
 		}
 		if dbResult.RecordNotFound() {
@@ -41,76 +43,81 @@ func AddAccount(brief string, dGroup string, weight int, accounts []domain.Accou
 		}
 		return nil, dbResult.Error
 	}
-	if len(adds) <= 0 {
-		db.Rollback()
-		return &result, nil
-	}
 
 	trans := db.Begin()
-	var devices []domain.Device
-	cur := trans
-	if dGroup != "" {
-		cur = cur.Where(&domain.Device{Group: dGroup})
-	}
-	if err := cur.Where("bind_count = 0").Where("status = 1").Limit(len(adds)).Find(&devices).Error; err != nil {
-		cur.Rollback()
-		return nil, err
-	}
-	var enableDevices []domain.Device
-	for i := range devices {
-		device := devices[i]
-		if err := trans.Table(device.TableName()).Where("id = ?", device.Id).Updates(domain.Device{BindCount: 1}).Error; err != nil {
-			trans.Rollback()
+	if len(adds) > 0 {
+		var devices []domain.Device
+		cur := trans
+		if dGroup != "" {
+			cur = cur.Where(&domain.Device{Group: dGroup})
+		}
+		if err := cur.Where("bind_count = 0").Where("status = 1").Limit(len(adds)).Find(&devices).Error; err != nil {
+			cur.Rollback()
 			return nil, err
 		}
-		dbResult := trans.Table(account.TableName()).Where("sn = ?", device.Sn).First(&account)
-		if dbResult.RecordNotFound() {
-			enableDevices = append(enableDevices, device)
-			continue
+		var enableDevices []domain.Device
+		for i := range devices {
+			device := devices[i]
+			if err := trans.Table(device.TableName()).Where("id = ?", device.Id).Updates(domain.Device{BindCount: 1}).Error; err != nil {
+				trans.Rollback()
+				return nil, err
+			}
+			dbResult := trans.Table(account.TableName()).Where("sn = ?", device.Sn).First(&account)
+			if dbResult.RecordNotFound() {
+				enableDevices = append(enableDevices, device)
+				continue
+			}
+			if dbResult.Error != nil {
+				trans.Rollback()
+				return nil, dbResult.Error
+			}
+			loggers.Warn.Printf("AddAccount sn used [%v]", account)
 		}
-		if dbResult.Error != nil {
-			trans.Rollback()
-			return nil, dbResult.Error
+
+		noDevices := adds[len(enableDevices):]
+		for i := range noDevices {
+			result.NoDevices = append(result.NoDevices, noDevices[i].Account)
 		}
-		loggers.Warn.Printf("AddAccount sn used [%v]", account)
+		result.Success = len(enableDevices)
+		if len(enableDevices) > 0 {
+			startId, err := getStartId(brief)
+			if err != nil {
+				trans.Rollback()
+				return nil, err
+			}
+
+			for i := range enableDevices {
+				account = adds[i]
+				device := enableDevices[i]
+				account.Id = startId
+				account.Sn = device.Sn
+				account.Imei = device.Imei
+				account.Seq = device.Seq
+				account.Model = device.Model
+				account.BuildNum = device.BuildNum
+				account.Mac = device.Mac
+				account.HardWare = device.HardWare
+				account.Wifi = device.Wifi
+				account.Version = device.Version
+				account.Brief = brief
+				account.Status = 1
+				if err := trans.Create(&account).Error; err != nil {
+					trans.Rollback()
+					return nil, err
+				}
+				startId += 1
+			}
+		}
 	}
 
-	noDevices := adds[len(enableDevices):]
-	for i := range noDevices {
-		result.NoDevices = append(result.NoDevices, noDevices[i].Account)
-	}
-	result.Success = len(enableDevices)
-	if result.Success == 0 {
-		trans.Rollback()
-		return &result, nil
-	}
-
-	startId, err := getStartId(brief)
-	if err != nil {
-		trans.Rollback()
-		return nil, err
-	}
-
-	for i := range enableDevices {
-		account = adds[i]
-		device := enableDevices[i]
-		account.Id = startId
-		account.Sn = device.Sn
-		account.Imei = device.Imei
-		account.Seq = device.Seq
-		account.Model = device.Model
-		account.BuildNum = device.BuildNum
-		account.Mac = device.Mac
-		account.HardWare = device.HardWare
-		account.Wifi = device.Wifi
-		account.Version = device.Version
-		account.Brief = brief
-		account.Status = 1
-		if err := trans.Create(&account).Error; err != nil {
-			trans.Rollback()
-			return nil, err
+	if len(exists) > 0 {
+		for i := range exists {
+			account = exists[i]
+			if err := trans.Table(account.TableName()).Where("account = ?", account.Account).Update("passwd", account.Passwd).Error; err != nil {
+				trans.Rollback()
+				return nil, err
+			}
 		}
-		startId += 1
 	}
 
 	if err := updateBrief(brief, weight, result.Success); err != nil {
