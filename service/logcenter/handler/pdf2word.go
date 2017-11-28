@@ -13,7 +13,7 @@ func CheckUpdate(r *httpserver.Request) *httpserver.Response {
 	os := r.QueryParams.Get("os")
 
 	loggers.Info.Printf("CheckUpdate deviceID:%s version:%s os:%s", deviceID, version, os)
-	latestVersion, err := adapter.GetLatestPDF2WordVersion()
+	latestVersion, err := adapter.GetLatestVersion()
 	if err != nil {
 		loggers.Error.Printf("CheckUpdate GetLatestVersion error:%s", err.Error())
 		return noNeedUpdate()
