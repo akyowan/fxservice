@@ -134,13 +134,13 @@ func AddAccount(brief string, dGroup string, weight int, accounts []domain.Accou
 }
 
 func RebindAccount() error {
-	db := dbPool.NewConn().Begin()
 	var (
 		accounts []domain.Account
 		devices  []domain.Device
 	)
-	limit := 100
 	for {
+		limit := 100
+		db := dbPool.NewConn().Begin()
 		if err := db.Where("errno = ?", 22).Limit(limit).Find(&accounts).Error; err != nil {
 			loggers.Info.Printf("RebindAccount no account need rebind")
 			db.Rollback()
@@ -158,7 +158,11 @@ func RebindAccount() error {
 		}
 
 		if len(devices) < len(accounts) {
+			db.Rollback()
 			loggers.Warn.Printf("RebindAccount no enought device for rebind account need:%d get:%d", len(accounts), len(devices))
+			if len(devices) == 0 {
+				return nil
+			}
 		}
 
 		for i, device := range devices {
@@ -177,13 +181,14 @@ func RebindAccount() error {
 			}
 			loggers.Info.Printf("RebindAccount account:%s sn:%s", account.Account, device.Sn)
 		}
+		if err := db.Commit().Error; err != nil {
+			db.Rollback()
+			return err
+		}
+		loggers.Info.Printf("RebindAccount account %d OK", len(devices))
 		if len(accounts) < limit {
 			break
 		}
-	}
-	if err := db.Commit().Error; err != nil {
-		db.Rollback()
-		return err
 	}
 
 	return nil

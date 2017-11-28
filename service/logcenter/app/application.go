@@ -28,6 +28,7 @@ func Start(addr string) {
 	r.RouteHandleFunc("/feedback", handler.Feedback).Methods("POST")
 	r.RouteHandleFunc("/crash", handler.DumpUpload).Methods("POST")
 	r.RouteHandleFunc("/checkUpdate", handler.CheckUpdate).Methods("GET")
+	r.RouteHandleFunc("/pdf2word/version", handler.PDF2WordVersion).Methods("GET")
 
 	loggers.Info.Printf("Starting LogCenter External Service [\033[0;32;1mOK\t%+v\033[0m] \n", addr)
 	panic(r.ListenAndServe(addr))

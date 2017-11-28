@@ -7,13 +7,13 @@ import (
 	versionCmp "github.com/hashicorp/go-version"
 )
 
-func CheckUpdate(r *httpserver.Request) *httpserver.Response {
+func PDF2WordVersion(r *httpserver.Request) *httpserver.Response {
 	deviceID := r.QueryParams.Get("device_id")
 	version := r.QueryParams.Get("version")
 	os := r.QueryParams.Get("os")
 
-	loggers.Info.Printf("CheckUpdate deviceID:%s version:%s os:%s", deviceID, version, os)
-	latestVersion, err := adapter.GetLatestVersion()
+	loggers.Info.Printf("PDF2Word plugin check update deviceID:%s version:%s os:%s", deviceID, version, os)
+	latestVersion, err := adapter.GetLatestPDF2WordVersion()
 	if err != nil {
 		loggers.Error.Printf("CheckUpdate GetLatestVersion error:%s", err.Error())
 		return noNeedUpdate()
